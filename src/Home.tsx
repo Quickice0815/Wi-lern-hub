@@ -1,10 +1,24 @@
 import { useNavigator } from './lib/navigation';
+import { Articles } from './modules/articles/data';
+import { ERM_TASKS } from './modules/erm/data';
+import { NUM_SYSTEMS } from './modules/numbers/data';
+import { PAP_LEVELS } from './modules/pap/data';
+import { SqlLevels } from './modules/sql/data';
 
 // ============================================================
 // STARTSEITE — professionelle Landingpage. Jede Karte führt per
 // Klick direkt in das jeweilige interaktive Programm (kein
-// externer Link, sondern ein Wechsel der App-Ansicht).
+// externer Link, sondern ein Wechsel der App-Ansicht). Die
+// Kennzahlen werden aus den echten, portierten Modul-Daten
+// berechnet statt hartkodiert zu sein.
 // ============================================================
+
+const totalQuestions = Articles.reduce((sum, a) => sum + a.questions.length, 0);
+const articlesWithWorked = Articles.filter((a) => a.hasWorked).length;
+const ermTaskCount = ERM_TASKS.length;
+const numSystemCount = NUM_SYSTEMS.length;
+const papLevelCount = PAP_LEVELS.length;
+const sqlLevelCount = SqlLevels.all.length;
 
 interface ModuleDef {
   icon: string;
@@ -25,7 +39,7 @@ export function HomePage() {
       title: 'Die 5 Artikel',
       subtitle:
         'Fünf Fachartikel mit je 11–13 Fragen. Anwendungsthemen werden erst erklärt, dann mit einer eigenen Aufgabe geprüft.',
-      meta: '60 Fragen · 5 Anwendungsaufgaben',
+      meta: `${totalQuestions} Fragen · ${articlesWithWorked} Anwendungsaufgaben`,
       actionLabel: 'Öffnen',
       color: 'var(--entity)',
       onOpen: () => nav.push({ name: 'articleMenu' }),
@@ -35,7 +49,7 @@ export function HomePage() {
       title: 'ERM-Trainer',
       subtitle:
         'Aus Text ein ER-Modell bauen: Entitäten, Beziehungen, Attribute und Kardinalitäten markieren, modellieren und auswerten lassen.',
-      meta: '6 Aufgaben · Tutorial inklusive',
+      meta: `${ermTaskCount} Aufgaben · Tutorial inklusive`,
       actionLabel: 'Öffnen',
       color: 'var(--relation)',
       onOpen: () => nav.push({ name: 'ermMenu' }),
@@ -45,7 +59,7 @@ export function HomePage() {
       title: 'Historische Zahlensysteme',
       subtitle:
         'Römisch, Ägyptisch, Babylonisch (Basis 60) und Maya (Basis 20): Tutorial je System, dann ein Endlos-Quiz.',
-      meta: '4 Zahlensysteme · Endlos-Quiz',
+      meta: `${numSystemCount} Zahlensysteme · Endlos-Quiz`,
       actionLabel: 'Spielen',
       color: 'var(--numbers)',
       onOpen: () => nav.push({ name: 'numbers' }),
@@ -55,7 +69,7 @@ export function HomePage() {
       title: 'PAP-Quest: Die Logik-Odyssee',
       subtitle:
         'Programmablaufpläne & Kontrollstrukturen: 6 Level von den 5 PAP-Symbolen über IF-THEN-ELSE bis zum Online-Shop-Endboss.',
-      meta: '6 Level · Punkte & Belohnungen',
+      meta: `${papLevelCount} Level · Punkte & Belohnungen`,
       actionLabel: 'Quest starten',
       color: 'var(--pap-action)',
       onOpen: () => nav.push({ name: 'papQuest' }),
@@ -65,7 +79,7 @@ export function HomePage() {
       title: 'SQL-Filterung trainieren',
       subtitle:
         'SAP S/4HANA Geschäftspartner verwalten: 10 Level zu WHERE, AND/OR, LIKE/NOT LIKE und Datumsbereichen, mit Tutorial und 3 Schwierigkeitsmodi.',
-      meta: '10 Level · 3 Schwierigkeitsmodi',
+      meta: `${sqlLevelCount} Level · 3 Schwierigkeitsmodi`,
       actionLabel: 'Trainieren',
       color: 'var(--sql-cyan)',
       onOpen: () => nav.push({ name: 'sqlTrainer' }),
@@ -189,10 +203,10 @@ function StatsBar() {
   return (
     <section className="card px-4 py-2 mb-12 grid grid-cols-2 sm:grid-cols-5 divide-x divide-line">
       <StatCard value="5" label="Programme" />
-      <StatCard value="60+" label="Quizfragen" />
-      <StatCard value="10" label="SQL-Level" />
-      <StatCard value="6" label="PAP-Level" />
-      <StatCard value="4" label="Zahlensysteme" />
+      <StatCard value={`${totalQuestions}+`} label="Quizfragen" />
+      <StatCard value={String(sqlLevelCount)} label="SQL-Level" />
+      <StatCard value={String(papLevelCount)} label="PAP-Level" />
+      <StatCard value={String(numSystemCount)} label="Zahlensysteme" />
     </section>
   );
 }
