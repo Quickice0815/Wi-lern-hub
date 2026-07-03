@@ -102,20 +102,25 @@ export function ErmCanvas({
 
   const handleTap = useCallback(
     (id: string) => {
-      setLinkingFrom((from) => {
-        if (from == null) return id;
-        if (from === id) return null;
-        setEdges((prev) => {
-          const exists = prev.some(
-            (e) => (e.fromNodeID === from && e.toNodeID === id) || (e.fromNodeID === id && e.toNodeID === from),
-          );
-          if (exists) return prev;
-          return [...prev, { id: makeId('edge'), fromNodeID: from, toNodeID: id, cardFrom: '1', cardTo: 'N' }];
-        });
-        return null;
+      if (linkingFrom == null) {
+        setLinkingFrom(id);
+        return;
+      }
+      if (linkingFrom === id) {
+        setLinkingFrom(null);
+        return;
+      }
+      const from = linkingFrom;
+      setEdges((prev) => {
+        const exists = prev.some(
+          (e) => (e.fromNodeID === from && e.toNodeID === id) || (e.fromNodeID === id && e.toNodeID === from),
+        );
+        if (exists) return prev;
+        return [...prev, { id: makeId('edge'), fromNodeID: from, toNodeID: id, cardFrom: '1', cardTo: 'N' }];
       });
+      setLinkingFrom(null);
     },
-    [setEdges],
+    [setEdges, linkingFrom],
   );
 
   const cycleCard = useCallback(
