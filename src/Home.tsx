@@ -1,4 +1,5 @@
 import { useNavigator } from './lib/navigation';
+import { AuthWidget } from './components/AuthWidget';
 import { Articles } from './modules/articles/data';
 import { ERM_TASKS } from './modules/erm/data';
 import { NUM_SYSTEMS } from './modules/numbers/data';
@@ -120,12 +121,15 @@ function SiteHeader() {
           </div>
           <span className="font-bold text-ink tracking-tight">WI · Lern-Hub</span>
         </div>
-        <a
-          href="#module"
-          className="text-sm font-semibold text-sub hover:text-ink transition-colors"
-        >
-          Themengebiete
-        </a>
+        <div className="flex items-center gap-4">
+          <a
+            href="#module"
+            className="text-sm font-semibold text-sub hover:text-ink transition-colors hidden sm:inline"
+          >
+            Themengebiete
+          </a>
+          <AuthWidget />
+        </div>
       </div>
     </header>
   );

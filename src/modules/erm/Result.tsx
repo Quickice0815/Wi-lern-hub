@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { normERM, type ERMCanvasEdge, type ERMCanvasNode, type ERMTask } from './data';
 import { PrimaryButton, SecondaryButton } from '../../components/ui';
 
@@ -19,40 +20,19 @@ export function ErmResult({
   edges,
   onRetry,
   onMenu,
+  onScored,
 }: {
   task: ERMTask;
   nodes: ERMCanvasNode[];
   edges: ERMCanvasEdge[];
   onRetry: () => void;
   onMenu: () => void;
+  onScored?: (pct: number) => void;
 }) {
   const userEntities = nodes.filter((n) => n.type === 'entity').map((n) => n.label);
   const userRelations = nodes.filter((n) => n.type === 'relation').map((n) => n.label);
   const userAttrs = nodes.filter((n) => n.type === 'attr').map((n) => n.label);
-
-  if (task.solution.entities.length === 0) {
-    return (
-      <div className="flex flex-col gap-4">
-        <h2 className="text-ink font-bold text-xl">Freies Üben — keine automatische Bewertung</h2>
-        <p className="text-sub text-sm leading-relaxed">
-          Für eigenen Text gibt es keine hinterlegte Musterlösung. Hier ist deine Übersicht zur Selbstkontrolle:
-        </p>
-        <div className="bg-bg rounded-[10px] p-4 flex flex-col gap-2.5">
-          <SummaryRow label="Entitäten" items={userEntities} color="var(--entity)" />
-          <SummaryRow label="Beziehungen" items={userRelations} color="var(--relation)" />
-          <SummaryRow label="Attribute" items={userAttrs} color="var(--attribute)" />
-          <span className="text-sub text-[13px]">{edges.length} Verbindung(en) gezeichnet</span>
-        </div>
-        <div className="flex gap-2.5">
-          <PrimaryButton color="var(--entity)" onClick={onRetry}>
-            Zurück zum Modell
-          </PrimaryButton>
-          <SecondaryButton onClick={onMenu}>Menü</SecondaryButton>
-        </div>
-      </div>
-    );
-  }
-
+  const hasSolution = task.solution.entities.length > 0;
   const sol = task.solution;
 
   const entRes: CheckItem[] = sol.entities.map((e) => ({
@@ -114,10 +94,38 @@ export function ErmResult({
     [entRes, pkRes, relRes, cardRes].reduce((sum, arr) => sum + arr.filter((i) => i.ok).length, 0) +
     attrRes.filter((i) => i.ok).length;
   const maxTotal = sol.entities.length * 2 + sol.relations.length * 2 + allSolAttrs.length;
-  const pct = maxTotal > 0 ? Math.round((gotTotal / maxTotal) * 100) : 0;
+  const pct = hasSolution && maxTotal > 0 ? Math.round((gotTotal / maxTotal) * 100) : 0;
   const gradeColor = pct >= 75 ? 'var(--good)' : pct >= 45 ? 'var(--warn)' : 'var(--bad)';
   const grade =
     pct >= 90 ? 'Sehr gut' : pct >= 75 ? 'Gut' : pct >= 60 ? 'Befriedigend' : pct >= 45 ? 'Ausreichend' : 'Nochmal üben';
+
+  useEffect(() => {
+    if (hasSolution) onScored?.(pct);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasSolution, pct]);
+
+  if (!hasSolution) {
+    return (
+      <div className="flex flex-col gap-4">
+        <h2 className="text-ink font-bold text-xl">Freies Üben — keine automatische Bewertung</h2>
+        <p className="text-sub text-sm leading-relaxed">
+          Für eigenen Text gibt es keine hinterlegte Musterlösung. Hier ist deine Übersicht zur Selbstkontrolle:
+        </p>
+        <div className="bg-bg rounded-[10px] p-4 flex flex-col gap-2.5">
+          <SummaryRow label="Entitäten" items={userEntities} color="var(--entity)" />
+          <SummaryRow label="Beziehungen" items={userRelations} color="var(--relation)" />
+          <SummaryRow label="Attribute" items={userAttrs} color="var(--attribute)" />
+          <span className="text-sub text-[13px]">{edges.length} Verbindung(en) gezeichnet</span>
+        </div>
+        <div className="flex gap-2.5">
+          <PrimaryButton color="var(--entity)" onClick={onRetry}>
+            Zurück zum Modell
+          </PrimaryButton>
+          <SecondaryButton onClick={onMenu}>Menü</SecondaryButton>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-[18px]">

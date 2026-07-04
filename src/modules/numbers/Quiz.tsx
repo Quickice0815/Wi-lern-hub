@@ -14,7 +14,15 @@ import { GlyphText, SysFlag } from './PictoGlyphs';
 
 const PRAISE = ['Stark!', 'Richtig!', 'Perfekt!', 'Sehr gut!', 'Genau!', 'Top!'];
 
-export function Quiz({ sys, onMenu }: { sys: NumSystem; onMenu: () => void }) {
+export function Quiz({
+  sys,
+  onMenu,
+  onAnswer,
+}: {
+  sys: NumSystem;
+  onMenu: () => void;
+  onAnswer?: (correct: boolean, streakAfter: number) => void;
+}) {
   const [question, setQuestion] = useState<NumQuestion>(() => makeQuestion(sys.id));
   const [picked, setPicked] = useState<number | null>(null);
   const [inputText, setInputText] = useState('');
@@ -46,13 +54,15 @@ export function Quiz({ sys, onMenu }: { sys: NumSystem; onMenu: () => void }) {
     if (submitted) return;
     setSubmitted(true);
     setTotal((t) => t + 1);
+    const newStreak = correctNow ? streak + 1 : 0;
     if (correctNow) {
       setRight((r) => r + 1);
-      setStreak((s) => s + 1);
+      setStreak(newStreak);
       setPraiseText(PRAISE[Math.floor(Math.random() * PRAISE.length)]);
     } else {
       setStreak(0);
     }
+    onAnswer?.(correctNow, newStreak);
   }
 
   function submit() {

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigator } from '../../lib/navigation';
+import { useCloudProgress } from '../../lib/progress';
 import { BackBar, PageShell } from '../../components/ui';
 import { SqlLevels, initialSqlProgress, type SqlLevel, type SqlMode, type SqlProgressState } from './data';
 import { SqlModeSelect } from './ModeSelect';
@@ -22,7 +23,7 @@ type View2 = 'mode' | 'map' | 'tutorial' | 'blocks' | 'freitext' | 'solution';
 export function SqlTrainer() {
   const nav = useNavigator();
 
-  const [progress, setProgress] = useState<SqlProgressState>(initialSqlProgress);
+  const [progress, setProgress] = useCloudProgress<SqlProgressState>('sql', initialSqlProgress);
   const [view2, setView2] = useState<View2>('mode');
   const [activeLevelID, setActiveLevelID] = useState<number | null>(null);
   const [pendingBlocksStars, setPendingBlocksStars] = useState(0);

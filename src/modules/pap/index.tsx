@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigator } from '../../lib/navigation';
+import { useCloudProgress } from '../../lib/progress';
 import { BackBar, PageShell, SecondaryButton } from '../../components/ui';
 import { PAP_LEVELS, POINTS_PER_LEVEL, type PapLevel } from './data';
 import { PapShapeIcon, PapProgressSegments, PapBadge, PapActionButton } from './ShapeIcon';
@@ -17,20 +18,40 @@ import { PapMatchChallenge } from './MatchChallenge';
 
 type PapStage = 'intro' | 'level' | 'victory';
 
+interface PapSavedProgress {
+  levelIndex: number;
+  score: number;
+  completed: boolean;
+}
+
+const initialPapProgress: PapSavedProgress = { levelIndex: 0, score: 0, completed: false };
+
 export function PapQuest() {
   const nav = useNavigator();
+  const [saved, setSaved] = useCloudProgress<PapSavedProgress>('pap', initialPapProgress);
   const [stage, setStage] = useState<PapStage>('intro');
   const [levelIndex, setLevelIndex] = useState(0);
   const [score, setScore] = useState(0);
 
   const level = PAP_LEVELS[levelIndex];
+  const canResume = saved.levelIndex > 0 && !saved.completed;
+
+  function start(fromIndex: number, fromScore: number) {
+    setLevelIndex(fromIndex);
+    setScore(fromScore);
+    setStage('level');
+  }
 
   function completeLevel() {
-    setScore((s) => s + POINTS_PER_LEVEL);
+    const nextScore = score + POINTS_PER_LEVEL;
+    setScore(nextScore);
     if (levelIndex + 1 < PAP_LEVELS.length) {
-      setLevelIndex((i) => i + 1);
+      const nextIndex = levelIndex + 1;
+      setLevelIndex(nextIndex);
+      setSaved({ levelIndex: nextIndex, score: nextScore, completed: false });
     } else {
       setStage('victory');
+      setSaved({ levelIndex, score: nextScore, completed: true });
     }
   }
 
@@ -38,6 +59,7 @@ export function PapQuest() {
     setStage('intro');
     setLevelIndex(0);
     setScore(0);
+    setSaved(initialPapProgress);
   }
 
   return (
@@ -49,7 +71,14 @@ export function PapQuest() {
       />
 
       <div className="flex flex-col gap-[18px]">
-        {stage === 'intro' && <IntroView onStart={() => setStage('level')} />}
+        {stage === 'intro' && (
+          <IntroView
+            canResume={canResume}
+            resumeLevel={saved.levelIndex}
+            onStart={() => start(0, 0)}
+            onResume={() => start(saved.levelIndex, saved.score)}
+          />
+        )}
         {stage === 'level' && (
           <LevelView level={level} levelIndex={levelIndex} onComplete={completeLevel} />
         )}
@@ -59,7 +88,17 @@ export function PapQuest() {
   );
 }
 
-function IntroView({ onStart }: { onStart: () => void }) {
+function IntroView({
+  canResume,
+  resumeLevel,
+  onStart,
+  onResume,
+}: {
+  canResume: boolean;
+  resumeLevel: number;
+  onStart: () => void;
+  onResume: () => void;
+}) {
   return (
     <div className="card flex flex-col items-center gap-[18px] p-7 text-center animate-fade-in-up">
       <div className="flex items-center gap-3.5">
@@ -74,7 +113,12 @@ function IntroView({ onStart }: { onStart: () => void }) {
         Von den 5 Grundsymbolen über IF-THEN-ELSE bis zum Online-Shop-Endboss. Jeder Level: kurze Erklärung +
         Challenge. Kein Weiterkommen ohne Lösung!
       </p>
-      <PapActionButton label="Quest starten 🚀" primary glow onClick={onStart} />
+      <div className="flex flex-wrap gap-2.5 justify-center">
+        {canResume && (
+          <PapActionButton label={`Weiter bei Level ${resumeLevel + 1} ▶️`} primary glow onClick={onResume} />
+        )}
+        <PapActionButton label={canResume ? 'Von vorne starten 🔁' : 'Quest starten 🚀'} primary={!canResume} onClick={onStart} />
+      </div>
     </div>
   );
 }

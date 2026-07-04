@@ -1,10 +1,13 @@
 import { useNavigator } from '../../lib/navigation';
+import { useCloudProgress } from '../../lib/progress';
 import { BackBar, PageShell, TagPill } from '../../components/ui';
 import { Articles } from './data';
+import type { ArticlesProgress } from './progressTypes';
 
 // Pendant zu ArticleMenuView.swift — Liste der 5 Artikel.
 export function ArticleMenu() {
   const nav = useNavigator();
+  const [progress] = useCloudProgress<ArticlesProgress>('articles', {});
 
   return (
     <PageShell>
@@ -47,9 +50,16 @@ export function ArticleMenu() {
               <h3 className="text-ink text-[16px] font-bold leading-snug">{article.title}</h3>
               <p className="text-sub text-[12.5px] leading-snug">{article.subtitle}</p>
             </div>
-            <span className="text-sub text-[12.5px] font-semibold shrink-0 hidden sm:block">
-              {article.questions.length} Fragen →
-            </span>
+            <div className="flex flex-col items-end gap-0.5 shrink-0">
+              {progress[article.id] && (
+                <span className="text-good text-[11px] font-bold">
+                  ✓ {progress[article.id].bestScore}/{progress[article.id].total}
+                </span>
+              )}
+              <span className="text-sub text-[12.5px] font-semibold hidden sm:block">
+                {article.questions.length} Fragen →
+              </span>
+            </div>
           </button>
         ))}
       </div>

@@ -1,4 +1,5 @@
 import { NavigatorProvider, useNavigator, type Route } from './lib/navigation';
+import { AuthProvider } from './lib/auth';
 import { HomePage } from './Home';
 import { ArticleMenu, ArticleSummary, Quiz, WorkedExample } from './modules/articles';
 import { ErmMenu, ErmFlow } from './modules/erm';
@@ -37,8 +38,10 @@ function AppShell() {
 
 export default function App() {
   return (
-    <NavigatorProvider>
-      <AppShell />
-    </NavigatorProvider>
+    <AuthProvider>
+      <NavigatorProvider>
+        <AppShell />
+      </NavigatorProvider>
+    </AuthProvider>
   );
 }
