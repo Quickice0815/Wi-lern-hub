@@ -1,3 +1,4 @@
+import { useNavigator } from '../../lib/navigation';
 import { SecondaryButton } from '../../components/ui';
 import { DIFFICULTY_LABELS, type LectureChapter, type LectureDifficulty, type LecturesProgress } from './types';
 
@@ -23,12 +24,34 @@ export function LectureDifficultySelect({
   onTutorial: () => void;
   onExit: () => void;
 }) {
+  const nav = useNavigator();
   return (
     <div className="flex flex-col gap-[18px]">
       <div className="flex gap-2">
         <SecondaryButton onClick={onExit}>← Vorlesungen</SecondaryButton>
         <SecondaryButton onClick={onTutorial}>↻ Lernkarten</SecondaryButton>
       </div>
+
+      {chapter.id === 'kapitel5' && (
+        <button
+          onClick={() => nav.push({ name: 'rasterTrainer' })}
+          className="card text-left p-[18px] flex flex-col gap-2 transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.5)]"
+          style={{ borderColor: chapter.color }}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-[24px] leading-none">🗂️</span>
+            <span className="text-sub text-xs font-bold">Bonus-Lernspiel</span>
+          </div>
+          <span className="text-ink font-bold text-[17px]">Raster-Trainer</span>
+          <span className="text-sub text-[13px] leading-relaxed">
+            Funktionen per Drag &amp; Drop im Rasterdiagramm den richtigen Abteilungen zuordnen — 2 Übungstypen,
+            3 Schwierigkeitsgrade.
+          </span>
+          <span className="font-bold text-[13px] mt-1" style={{ color: chapter.color }}>
+            Spielen →
+          </span>
+        </button>
+      )}
 
       <div>
         <h2 className="text-ink text-2xl font-bold mb-1.5">Übungsstufe wählen</h2>

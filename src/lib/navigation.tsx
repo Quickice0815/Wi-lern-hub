@@ -16,7 +16,8 @@ export type Route =
   | { name: 'papQuest' }
   | { name: 'sqlTrainer' }
   | { name: 'lectureMenu' }
-  | { name: 'lectureFlow'; chapterId: string };
+  | { name: 'lectureFlow'; chapterId: string }
+  | { name: 'rasterTrainer' };
 
 interface NavigatorState {
   path: Route[];
