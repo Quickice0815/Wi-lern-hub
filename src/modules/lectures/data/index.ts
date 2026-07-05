@@ -7,6 +7,7 @@ import { kapitel6 } from './kapitel6';
 import { kapitel7 } from './kapitel7';
 import { kapitel8 } from './kapitel8';
 import { kapitel9 } from './kapitel9';
+import { kapitel10 } from './kapitel10';
 import { kapitel11 } from './kapitel11';
 import type { LectureChapter } from '../types';
 
@@ -20,5 +21,6 @@ export const LECTURE_CHAPTERS: LectureChapter[] = [
   kapitel7,
   kapitel8,
   kapitel9,
+  kapitel10,
   kapitel11,
 ];
