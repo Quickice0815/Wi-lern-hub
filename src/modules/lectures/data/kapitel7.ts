@@ -294,8 +294,7 @@ export const kapitel7: LectureChapter = {
           'Geräte-basierte Lizenzen wie „Pro Prozessor" oder „Pro benannter Maschine", da der Kunde die zugrunde liegende Hardware im On-Demand-Modell nicht selbst besitzt oder kontrolliert',
           'Zeitbasierte Lizenzen wie Flat Rate',
           'Nutzungsvorgang-basierte Lizenzen wie „Pay per Use"',
-          ,
-        ].filter(Boolean) as string[],
+        ],
         correct: 1,
         explain:
           'On-Demand bedeutet laut Hosting-Folie Miete der Server/Software ohne eigene Infrastruktur beim Kunden. Geräte-basierte Lizenzmodelle setzen jedoch voraus, dass eine konkrete, dem Kunden bekannte Maschine oder ein Prozessor gezählt werden kann – das passt nicht zum Modell, in dem der Anbieter Hard- und Software betreibt.',
