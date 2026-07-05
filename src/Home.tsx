@@ -97,6 +97,16 @@ export function HomePage() {
       color: 'var(--attribute)',
       onOpen: () => nav.push({ name: 'lectureMenu' }),
     },
+    {
+      icon: '🗂️',
+      title: 'Raster-Trainer',
+      subtitle:
+        'Funktionen per Drag & Drop im Rasterdiagramm den richtigen Abteilungen zuordnen — 2 Übungstypen, 3 Schwierigkeitsgrade.',
+      meta: '2 Übungstypen · 3 Stufen',
+      actionLabel: 'Spielen',
+      color: 'var(--pap-control)',
+      onOpen: () => nav.push({ name: 'rasterTrainer' }),
+    },
   ];
 
   return (
@@ -157,9 +167,10 @@ function Hero() {
         Wirtschaftsinformatik verstehen, nicht nur auswendig lernen.
       </h1>
       <p className="text-sub text-[15.5px] sm:text-base mt-4 max-w-xl leading-relaxed">
-        Fünf interaktive Lernprogramme in einem Hub: Fachartikel mit Quiz, ein ERM-Trainer, ein
-        Zahlensysteme-Spiel, eine PAP-Quest und ein SQL-Trainer. Ein Klick auf ein Themengebiet
-        öffnet direkt das passende Programm — ganz ohne Umweg.
+        Sieben interaktive Lernprogramme in einem Hub: Fachartikel mit Quiz, ein ERM-Trainer, ein
+        Zahlensysteme-Spiel, eine PAP-Quest, ein SQL-Trainer, die Vorlesungskapitel und der
+        Raster-Trainer. Ein Klick auf ein Themengebiet öffnet direkt das passende Programm — ganz
+        ohne Umweg.
       </p>
       <div className="flex flex-wrap gap-3 mt-7">
         <a href="#module" className="btn-primary inline-block">
@@ -218,7 +229,7 @@ function StatCard({ value, label }: { value: string; label: string }) {
 function StatsBar() {
   return (
     <section className="card px-4 py-2 mb-12 grid grid-cols-2 sm:grid-cols-6 divide-x divide-line">
-      <StatCard value="6" label="Programme" />
+      <StatCard value="7" label="Programme" />
       <StatCard value={`${totalQuestions}+`} label="Quizfragen" />
       <StatCard value={String(sqlLevelCount)} label="SQL-Level" />
       <StatCard value={String(papLevelCount)} label="PAP-Level" />
