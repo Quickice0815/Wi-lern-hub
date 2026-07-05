@@ -34,7 +34,6 @@ export function LectureFlow({ chapterId }: { chapterId: string }) {
         },
       };
     });
-    setStep('select');
   }
 
   const titles: Record<Step, string> = {
