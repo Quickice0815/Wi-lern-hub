@@ -1,5 +1,6 @@
 import { NavigatorProvider, useNavigator, type Route } from './lib/navigation';
 import { AuthProvider } from './lib/auth';
+import { BackBar, PageShell } from './components/ui';
 import { HomePage } from './Home';
 import { ArticleMenu, ArticleSummary, Quiz, WorkedExample } from './modules/articles';
 import { ErmMenu, ErmFlow } from './modules/erm';
@@ -7,8 +8,10 @@ import { NumbersGame } from './modules/numbers';
 import { PapQuest } from './modules/pap';
 import { SqlTrainer } from './modules/sql';
 import { LectureMenu, LectureFlow } from './modules/lectures';
+import { RasterTrainer } from './modules/lectures/RasterTrainer';
 
 function RouteOutlet({ route }: { route: Route }) {
+  const nav = useNavigator();
   switch (route.name) {
     case 'articleMenu':
       return <ArticleMenu />;
@@ -32,6 +35,13 @@ function RouteOutlet({ route }: { route: Route }) {
       return <LectureMenu />;
     case 'lectureFlow':
       return <LectureFlow chapterId={route.chapterId} />;
+    case 'rasterTrainer':
+      return (
+        <PageShell>
+          <BackBar title="Raster-Trainer" onBack={() => nav.pop()} />
+          <RasterTrainer />
+        </PageShell>
+      );
   }
 }
 
