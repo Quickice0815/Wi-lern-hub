@@ -1,9 +1,17 @@
 import { useState } from 'react';
 import { useNavigator } from '../../lib/navigation';
 import { useCloudProgress } from '../../lib/progress';
-import { BackBar, Card, PageShell, PrimaryButton, ProgressBar, SecondaryButton } from '../../components/ui';
+import {
+  BackBar,
+  Card,
+  FeedbackBox,
+  OptionButton,
+  PageShell,
+  PrimaryButton,
+  ProgressBar,
+  SecondaryButton,
+} from '../../components/ui';
 import { getArticle } from './data';
-import { FeedbackBox, OptionButton } from './shared';
 import type { ArticlesProgress } from './progressTypes';
 
 interface AnswerRecord {

@@ -14,7 +14,9 @@ export type Route =
   | { name: 'ermFlow'; startTutorial: boolean }
   | { name: 'numbers' }
   | { name: 'papQuest' }
-  | { name: 'sqlTrainer' };
+  | { name: 'sqlTrainer' }
+  | { name: 'lectureMenu' }
+  | { name: 'lectureFlow'; chapterId: string };
 
 interface NavigatorState {
   path: Route[];

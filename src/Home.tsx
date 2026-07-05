@@ -5,6 +5,7 @@ import { ERM_TASKS } from './modules/erm/data';
 import { NUM_SYSTEMS } from './modules/numbers/data';
 import { PAP_LEVELS } from './modules/pap/data';
 import { SqlLevels } from './modules/sql/data';
+import { LECTURE_CHAPTERS } from './modules/lectures/data';
 
 // ============================================================
 // STARTSEITE — professionelle Landingpage. Jede Karte führt per
@@ -20,6 +21,7 @@ const ermTaskCount = ERM_TASKS.length;
 const numSystemCount = NUM_SYSTEMS.length;
 const papLevelCount = PAP_LEVELS.length;
 const sqlLevelCount = SqlLevels.all.length;
+const lectureChapterCount = LECTURE_CHAPTERS.length;
 
 interface ModuleDef {
   icon: string;
@@ -84,6 +86,16 @@ export function HomePage() {
       actionLabel: 'Trainieren',
       color: 'var(--sql-cyan)',
       onOpen: () => nav.push({ name: 'sqlTrainer' }),
+    },
+    {
+      icon: '📖',
+      title: 'Vorlesungen',
+      subtitle:
+        'Die Kapitel der Vorlesung „Einführung in die Wirtschaftsinformatik": kurzes Tutorial je Kapitel, dann Übungen in drei Schwierigkeitsstufen.',
+      meta: `${lectureChapterCount} Kapitel · 3 Stufen`,
+      actionLabel: 'Öffnen',
+      color: 'var(--attribute)',
+      onOpen: () => nav.push({ name: 'lectureMenu' }),
     },
   ];
 
@@ -205,12 +217,13 @@ function StatCard({ value, label }: { value: string; label: string }) {
 
 function StatsBar() {
   return (
-    <section className="card px-4 py-2 mb-12 grid grid-cols-2 sm:grid-cols-5 divide-x divide-line">
-      <StatCard value="5" label="Programme" />
+    <section className="card px-4 py-2 mb-12 grid grid-cols-2 sm:grid-cols-6 divide-x divide-line">
+      <StatCard value="6" label="Programme" />
       <StatCard value={`${totalQuestions}+`} label="Quizfragen" />
       <StatCard value={String(sqlLevelCount)} label="SQL-Level" />
       <StatCard value={String(papLevelCount)} label="PAP-Level" />
       <StatCard value={String(numSystemCount)} label="Zahlensysteme" />
+      <StatCard value={String(lectureChapterCount)} label="Vorlesungen" />
     </section>
   );
 }

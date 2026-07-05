@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { useNavigator } from '../../lib/navigation';
 import { useCloudProgress } from '../../lib/progress';
-import { BackBar, Card, PageShell, PrimaryButton, SecondaryButton } from '../../components/ui';
+import { BackBar, Card, FeedbackBox, OptionButton, PageShell, PrimaryButton, SecondaryButton } from '../../components/ui';
 import { WorkedExamples } from './data';
-import { FeedbackBox, OptionButton } from './shared';
 import type { ArticlesProgress } from './progressTypes';
 
 type Phase = 'learn' | 'exercise';
