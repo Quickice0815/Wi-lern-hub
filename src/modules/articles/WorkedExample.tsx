@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigator } from '../../lib/navigation';
-import { BackBar, Card, PageShell, PrimaryButton, SecondaryButton } from '../../components/ui';
+import { useCloudProgress } from '../../lib/progress';
+import { BackBar, Card, FeedbackBox, OptionButton, PageShell, PrimaryButton, SecondaryButton } from '../../components/ui';
 import { WorkedExamples } from './data';
-import { FeedbackBox, OptionButton } from './shared';
+import type { ArticlesProgress } from './progressTypes';
 
 type Phase = 'learn' | 'exercise';
 
@@ -15,6 +16,7 @@ export function WorkedExample({ exampleKey, backToArticleId }: { exampleKey: str
 
   const [phase, setPhase] = useState<Phase>('learn');
   const [picked, setPicked] = useState<number | null>(null);
+  const [, setProgress] = useCloudProgress<ArticlesProgress>('articles', {});
 
   if (!data) {
     return (
@@ -60,7 +62,14 @@ export function WorkedExample({ exampleKey, backToArticleId }: { exampleKey: str
               answered={answered}
               correct={correct}
               onPick={(oi) => {
-                if (!answered) setPicked(oi);
+                if (answered) return;
+                setPicked(oi);
+                if (oi === data.exercise.correct) {
+                  setProgress((prev) => ({
+                    ...prev,
+                    [backToArticleId]: { ...prev[backToArticleId], bestScore: prev[backToArticleId]?.bestScore ?? 0, total: prev[backToArticleId]?.total ?? 0, workedDone: true },
+                  }));
+                }
               }}
             />
           )}

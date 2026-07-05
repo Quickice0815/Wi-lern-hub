@@ -1,10 +1,12 @@
 import { NavigatorProvider, useNavigator, type Route } from './lib/navigation';
+import { AuthProvider } from './lib/auth';
 import { HomePage } from './Home';
 import { ArticleMenu, ArticleSummary, Quiz, WorkedExample } from './modules/articles';
 import { ErmMenu, ErmFlow } from './modules/erm';
 import { NumbersGame } from './modules/numbers';
 import { PapQuest } from './modules/pap';
 import { SqlTrainer } from './modules/sql';
+import { LectureMenu, LectureFlow } from './modules/lectures';
 
 function RouteOutlet({ route }: { route: Route }) {
   switch (route.name) {
@@ -26,6 +28,10 @@ function RouteOutlet({ route }: { route: Route }) {
       return <PapQuest />;
     case 'sqlTrainer':
       return <SqlTrainer />;
+    case 'lectureMenu':
+      return <LectureMenu />;
+    case 'lectureFlow':
+      return <LectureFlow chapterId={route.chapterId} />;
   }
 }
 
@@ -37,8 +43,10 @@ function AppShell() {
 
 export default function App() {
   return (
-    <NavigatorProvider>
-      <AppShell />
-    </NavigatorProvider>
+    <AuthProvider>
+      <NavigatorProvider>
+        <AppShell />
+      </NavigatorProvider>
+    </AuthProvider>
   );
 }

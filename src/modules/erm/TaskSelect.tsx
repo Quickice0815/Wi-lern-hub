@@ -15,6 +15,7 @@ export function ErmTaskSelect({
   onStart,
   onTutorial,
   onExit,
+  bestScores = {},
 }: {
   taskIndex: number;
   setTaskIndex: (i: number) => void;
@@ -25,6 +26,7 @@ export function ErmTaskSelect({
   onStart: () => void;
   onTutorial: () => void;
   onExit: () => void;
+  bestScores?: Record<string, number>;
 }) {
   const customLongEnough = customText.trim().length >= 20;
 
@@ -44,19 +46,27 @@ export function ErmTaskSelect({
       </div>
 
       <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-        {ERM_TASKS.map((t, i) => (
-          <button
-            key={t.id}
-            onClick={() => {
-              setUseCustomText(false);
-              setTaskIndex(i);
-            }}
-            className="shrink-0 font-semibold text-white rounded-[9px] px-3.5 py-2.5 whitespace-nowrap transition-colors"
-            style={{ fontSize: 13, background: !useCustomText && taskIndex === i ? 'var(--entity)' : 'var(--panel-2)' }}
-          >
-            {t.title}
-          </button>
-        ))}
+        {ERM_TASKS.map((t, i) => {
+          const best = bestScores[t.id];
+          return (
+            <button
+              key={t.id}
+              onClick={() => {
+                setUseCustomText(false);
+                setTaskIndex(i);
+              }}
+              className="shrink-0 font-semibold text-white rounded-[9px] px-3.5 py-2.5 whitespace-nowrap transition-colors flex items-center gap-1.5"
+              style={{ fontSize: 13, background: !useCustomText && taskIndex === i ? 'var(--entity)' : 'var(--panel-2)' }}
+            >
+              {t.title}
+              {best !== undefined && (
+                <span className="text-[11px] font-bold" style={{ color: best >= 75 ? 'var(--good)' : 'var(--warn)' }}>
+                  {best}%
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
       <div className="card p-[18px] flex flex-col gap-2.5">

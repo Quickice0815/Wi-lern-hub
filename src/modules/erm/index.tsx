@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigator } from '../../lib/navigation';
+import { useCloudProgress } from '../../lib/progress';
 import { BackBar, PageShell } from '../../components/ui';
 import { ERM_TASKS, type ERMCanvasEdge, type ERMCanvasNode, type ERMNodeType, type ERMTask } from './data';
 import { ErmTutorial } from './Tutorial';
@@ -76,6 +77,7 @@ export function ErmFlow({ startWithTutorial }: { startWithTutorial: boolean }) {
   const [taskIndex, setTaskIndex] = useState(0);
   const [useCustomText, setUseCustomText] = useState(false);
   const [customText, setCustomText] = useState('');
+  const [bestScores, setBestScores] = useCloudProgress<Record<string, number>>('erm', {});
 
   const [labels, setLabels] = useState<Record<number, ERMNodeType>>({});
   const [nodes, setNodes] = useState<ERMCanvasNode[]>([]);
@@ -105,6 +107,7 @@ export function ErmFlow({ startWithTutorial }: { startWithTutorial: boolean }) {
           setUseCustomText={setUseCustomText}
           customText={customText}
           setCustomText={setCustomText}
+          bestScores={bestScores}
           onStart={() => {
             resetWork();
             setStep('classify');
@@ -140,6 +143,10 @@ export function ErmFlow({ startWithTutorial }: { startWithTutorial: boolean }) {
           onMenu={() => {
             resetWork();
             setStep('select');
+          }}
+          onScored={(pct) => {
+            if (currentTask.id === 'custom') return;
+            setBestScores((prev) => ({ ...prev, [currentTask.id]: Math.max(prev[currentTask.id] ?? 0, pct) }));
           }}
         />
       )}

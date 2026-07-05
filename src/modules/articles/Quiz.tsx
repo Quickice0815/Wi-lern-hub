@@ -1,8 +1,18 @@
 import { useState } from 'react';
 import { useNavigator } from '../../lib/navigation';
-import { BackBar, Card, PageShell, PrimaryButton, ProgressBar, SecondaryButton } from '../../components/ui';
+import { useCloudProgress } from '../../lib/progress';
+import {
+  BackBar,
+  Card,
+  FeedbackBox,
+  OptionButton,
+  PageShell,
+  PrimaryButton,
+  ProgressBar,
+  SecondaryButton,
+} from '../../components/ui';
 import { getArticle } from './data';
-import { FeedbackBox, OptionButton } from './shared';
+import type { ArticlesProgress } from './progressTypes';
 
 interface AnswerRecord {
   correct: boolean;
@@ -18,6 +28,7 @@ export function Quiz({ articleId }: { articleId: string }) {
   const [picked, setPicked] = useState<number | null>(null);
   const [answers, setAnswers] = useState<AnswerRecord[]>([]);
   const [done, setDone] = useState(false);
+  const [, setProgress] = useCloudProgress<ArticlesProgress>('articles', {});
 
   if (!article) {
     return (
@@ -44,6 +55,18 @@ export function Quiz({ articleId }: { articleId: string }) {
       setPicked(null);
     } else {
       setDone(true);
+      const score = answers.filter((a) => a.correct).length;
+      setProgress((prev) => {
+        const prevEntry = prev[articleId];
+        return {
+          ...prev,
+          [articleId]: {
+            bestScore: Math.max(prevEntry?.bestScore ?? 0, score),
+            total: article!.questions.length,
+            workedDone: prevEntry?.workedDone,
+          },
+        };
+      });
     }
   }
 
