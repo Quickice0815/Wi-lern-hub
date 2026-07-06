@@ -17,8 +17,7 @@ export type Route =
   | { name: 'sqlTrainer' }
   | { name: 'lectureMenu' }
   | { name: 'lectureFlow'; chapterId: string }
-  | { name: 'rasterTrainer' }
-  | { name: 'strategyHub' };
+  | { name: 'rasterTrainer' };
 
 interface NavigatorState {
   path: Route[];

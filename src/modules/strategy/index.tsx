@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useNavigator } from '../../lib/navigation';
 import { useCloudProgress } from '../../lib/progress';
-import { BackBar, PageShell, ProgressBar } from '../../components/ui';
+import { AuthWidget } from '../../components/AuthWidget';
+import { ProgressBar } from '../../components/ui';
 import { DIAGRAMS, CASE_STUDIES, TERM_MATCH_SETS } from './data';
 import { StrategyTutorial } from './Tutorial';
 import { DiagramLabeling } from './DiagramLabeling';
@@ -9,9 +9,9 @@ import { CaseStudyPriority } from './CaseStudyPriority';
 import { TermMatch } from './TermMatch';
 
 // ============================================================
-// STRATEGIE & FÜHRUNG — Einstieg, Übungstyp-Auswahl und Ablauf.
-// Analog zu PapQuest/RasterTrainer lebt der gesamte Flow als
-// lokaler State hinter genau einer Route ('strategyHub').
+// STRATEGIE UND FÜHRUNG — eigenständige Lern-App (kein Teil des
+// WI-Lern-Hub-Navigators). Eigene Startseite/Branding, der gesamte
+// Ablauf lebt als lokaler State in dieser einen Komponente.
 // ============================================================
 
 type ExerciseKind = 'diagram' | 'case' | 'term';
@@ -53,8 +53,7 @@ function listFor(kind: ExerciseKind) {
   return kind === 'diagram' ? DIAGRAMS : kind === 'case' ? CASE_STUDIES : TERM_MATCH_SETS;
 }
 
-export function StrategyHub() {
-  const nav = useNavigator();
+export function StrategyApp() {
   const [progress, setProgress] = useCloudProgress<StrategyProgress>('strategy', initialProgress);
   const [view, setView] = useState<View>({ kind: 'menu' });
   const [showTutorial, setShowTutorial] = useState(!progress.onboardingSeen);
@@ -89,84 +88,121 @@ export function StrategyHub() {
 
   const totalDone = progress.completedDiagrams.length + progress.completedCases.length + progress.completedTerms.length;
   const totalAll = DIAGRAMS.length + CASE_STUDIES.length + TERM_MATCH_SETS.length;
+  const onMenu = view.kind === 'menu';
 
   return (
-    <PageShell>
-      <BackBar
-        title="Strategie & Führung"
-        onBack={() => (view.kind === 'menu' ? nav.popToRoot() : setView({ kind: 'menu' }))}
-      />
-
-      {showTutorial && <StrategyTutorial onDone={finishOnboarding} />}
-
-      {view.kind === 'menu' && (
-        <div className="flex flex-col gap-4">
-          <div className="card p-5 flex flex-col gap-2 animate-fade-in-up">
-            <p className="text-ink text-[15px] leading-relaxed">
-              Statt Definitionen auswendig zu lernen, wendest du hier Strategie- und Führungsmodelle aktiv an:
-              Diagramme selbst beschriften, Fallstudien lösen und Fachbegriffe im Kontext einsetzen.
-            </p>
-            <div className="flex items-center gap-2 pt-1">
-              <ProgressBar value={totalAll ? totalDone / totalAll : 0} color="var(--strategy)" />
-              <span className="text-xs font-semibold text-sub shrink-0">
-                {totalDone}/{totalAll}
-              </span>
-            </div>
-            <button
-              className="text-xs font-semibold text-left mt-1 w-fit hover:underline"
-              style={{ color: 'var(--strategy)' }}
-              onClick={() => setShowTutorial(true)}
+    <div className="min-h-screen bg-bg">
+      <header className="sticky top-0 z-10 backdrop-blur-md bg-bg/85 border-b border-line">
+        <div className="mx-auto max-w-3xl px-5 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div
+              className="h-8 w-8 rounded-lg flex items-center justify-center font-extrabold text-white text-sm shrink-0"
+              style={{ background: 'var(--strategy)' }}
             >
-              ↻ Tutorial erneut ansehen
-            </button>
+              S
+            </div>
+            <span className="font-bold text-ink tracking-tight">Strategie und Führung</span>
           </div>
-
-          <div className="grid grid-cols-1 gap-3.5">
-            {(Object.keys(EXERCISE_INFO) as ExerciseKind[]).map((kind) => {
-              const info = EXERCISE_INFO[kind];
-              const items = listFor(kind);
-              const doneList =
-                kind === 'diagram'
-                  ? progress.completedDiagrams
-                  : kind === 'case'
-                    ? progress.completedCases
-                    : progress.completedTerms;
-              return (
-                <button
-                  key={kind}
-                  onClick={() => startExercise(kind)}
-                  className="card text-left p-5 flex flex-col gap-2.5 transition-all hover:-translate-y-0.5"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <span className="text-3xl leading-none">{info.icon}</span>
-                    <span
-                      className="pill shrink-0"
-                      style={{ color: 'var(--strategy)', background: 'color-mix(in srgb, var(--strategy) 15%, transparent)' }}
-                    >
-                      {doneList.length}/{items.length}
-                    </span>
-                  </div>
-                  <h3 className="text-ink font-bold text-lg">{info.title}</h3>
-                  <p className="text-sub text-[13.5px] leading-relaxed">{info.desc}</p>
-                </button>
-              );
-            })}
-          </div>
+          <AuthWidget />
         </div>
-      )}
+      </header>
 
-      {(view.kind === 'diagram' || view.kind === 'case' || view.kind === 'term') && (
-        <ExerciseRunner view={view as { kind: ExerciseKind; index: number }} onAdvance={advance} />
-      )}
+      <main className="mx-auto max-w-3xl px-5 py-6 pb-16">
+        {showTutorial && <StrategyTutorial onDone={finishOnboarding} />}
 
-      {view.kind === 'done' && (
-        <DoneView
-          exercise={view.exercise}
-          onRestart={() => setView({ kind: view.exercise, index: 0 })}
-          onHome={() => setView({ kind: 'menu' })}
-        />
-      )}
-    </PageShell>
+        {onMenu ? (
+          <>
+            <section className="pt-4 pb-2">
+              <p className="font-bold text-xs tracking-[0.08em] mb-3" style={{ color: 'var(--strategy)' }}>
+                STRATEGIE &amp; FÜHRUNG · KLAUSURVORBEREITUNG
+              </p>
+              <h1 className="text-ink font-extrabold leading-[1.08] text-[32px] sm:text-[40px]">
+                Strategie und Führung anwenden statt auswendig lernen.
+              </h1>
+              <p className="text-sub text-[15px] sm:text-base mt-4 leading-relaxed">
+                Statt Definitionen zu pauken, wendest du hier Strategie- und Führungsmodelle aktiv an: Diagramme
+                selbst beschriften, Fallstudien lösen und Fachbegriffe im Kontext einsetzen.
+              </p>
+            </section>
+
+            <div className="card p-5 flex flex-col gap-2 animate-fade-in-up mt-4">
+              <div className="flex items-center gap-2">
+                <ProgressBar value={totalAll ? totalDone / totalAll : 0} color="var(--strategy)" />
+                <span className="text-xs font-semibold text-sub shrink-0">
+                  {totalDone}/{totalAll}
+                </span>
+              </div>
+              <button
+                className="text-xs font-semibold text-left mt-1 w-fit hover:underline"
+                style={{ color: 'var(--strategy)' }}
+                onClick={() => setShowTutorial(true)}
+              >
+                ↻ Tutorial erneut ansehen
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3.5 mt-4">
+              {(Object.keys(EXERCISE_INFO) as ExerciseKind[]).map((kind) => {
+                const info = EXERCISE_INFO[kind];
+                const items = listFor(kind);
+                const doneList =
+                  kind === 'diagram'
+                    ? progress.completedDiagrams
+                    : kind === 'case'
+                      ? progress.completedCases
+                      : progress.completedTerms;
+                return (
+                  <button
+                    key={kind}
+                    onClick={() => startExercise(kind)}
+                    className="card text-left p-5 flex flex-col gap-2.5 transition-all hover:-translate-y-0.5"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <span className="text-3xl leading-none">{info.icon}</span>
+                      <span
+                        className="pill shrink-0"
+                        style={{ color: 'var(--strategy)', background: 'color-mix(in srgb, var(--strategy) 15%, transparent)' }}
+                      >
+                        {doneList.length}/{items.length}
+                      </span>
+                    </div>
+                    <h3 className="text-ink font-bold text-lg">{info.title}</h3>
+                    <p className="text-sub text-[13.5px] leading-relaxed">{info.desc}</p>
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={() => setView({ kind: 'menu' })}
+              className="flex items-center gap-1.5 text-sub hover:text-ink transition-colors text-sm font-semibold mb-5"
+            >
+              <span aria-hidden>←</span> Übungstypen
+            </button>
+
+            {(view.kind === 'diagram' || view.kind === 'case' || view.kind === 'term') && (
+              <ExerciseRunner view={view as { kind: ExerciseKind; index: number }} onAdvance={advance} />
+            )}
+
+            {view.kind === 'done' && (
+              <DoneView
+                exercise={view.exercise}
+                onRestart={() => setView({ kind: view.exercise, index: 0 })}
+                onHome={() => setView({ kind: 'menu' })}
+              />
+            )}
+          </>
+        )}
+      </main>
+
+      <footer className="border-t border-line">
+        <div className="mx-auto max-w-3xl px-5 py-8 text-center">
+          <p className="text-sub text-xs">© {new Date().getFullYear()} Strategie und Führung</p>
+        </div>
+      </footer>
+    </div>
   );
 }
 
