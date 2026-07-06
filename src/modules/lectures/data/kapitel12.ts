@@ -225,12 +225,13 @@ export const kapitel12: LectureChapter = {
         title: 'Zahlungsausgang buchen',
         screenTitle: 'Zahlung',
         scenario:
-          'Sie müssen heute einen Zahlungsausgang in Höhe von 2.546,00 EUR buchen. Grundlage ist eine Aufwandsbuchung auf dem ' +
-          'Kreditorenkonto 211999 (Power Supply) und dem Aufwandskonto 6000000. Der Zahlungsausgang soll in der ' +
-          'Buchhaltungsperiode Mai ausgewiesen und auf dem Bankkonto 1800000 gebucht werden.',
+          'Heute, am 16.07.2024, müssen Sie einen Zahlungsausgang in Höhe von 2.546,00 EUR buchen. Grundlage ist eine ' +
+          'Aufwandsbuchung auf dem Kreditorenkonto 211999 (Power Supply) und dem Aufwandskonto 6000000. Der Zahlungsausgang ' +
+          'soll in der Buchhaltungsperiode Mai 2024 ausgewiesen und auf dem Bankkonto 1800000 gebucht werden.',
         instructions: 'Füllen Sie den Bildschirm nur mit den relevanten Feldern aus. Nicht benötigte Felder bleiben leer.',
         givenFields: [
           { label: 'Buchungskreis', value: 'DE00' },
+          { label: 'Buchungsbelegdatum', value: '16.07.2024' },
           { label: 'Buchungsbelegart', value: 'KZ' },
         ],
         fields: [
@@ -262,9 +263,10 @@ export const kapitel12: LectureChapter = {
           { id: 'buchen', label: 'Buchen' },
         ],
         explanation:
-          'Nur die tatsächlich benötigten Felder wurden ausgefüllt: Buchungsdatum (im Mai, damit die Periode passt), das Bankkonto ' +
-          'als Sachkonto, der Betrag sowie Kontoart „Kreditor" mit der Konto-ID 211999. Über „Posten anzeigen" werden die offenen ' +
-          'Posten geladen, der zum Betrag passende Posten (-2.546,00 EUR) wird ausgeglichen, danach wird gebucht.',
+          'Nur die tatsächlich benötigten Felder wurden ausgefüllt: Buchungsdatum (ein Tag im Mai 2024, damit die Periode passt ' +
+          '— das Jahr ergibt sich aus dem gegebenen Buchungsbelegdatum 16.07.2024), das Bankkonto als Sachkonto, der Betrag ' +
+          'sowie Kontoart „Kreditor" mit der Konto-ID 211999. Über „Posten anzeigen" werden die offenen Posten geladen, der zum ' +
+          'Betrag passende Posten (-2.546,00 EUR) wird ausgeglichen, danach wird gebucht.',
       },
     ],
     errorCases: [
