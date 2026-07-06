@@ -26,6 +26,7 @@
   --pap-decision: #fb923c;
   --pap-io: #f472b6;
   --sql-cyan: #22d3ee;
+  --strategy: #c026d3;
 }
 
 @theme inline {
@@ -51,6 +52,7 @@
   --color-pap-decision: var(--pap-decision);
   --color-pap-io: var(--pap-io);
   --color-sql-cyan: var(--sql-cyan);
+  --color-strategy: var(--strategy);
 
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
 }
@@ -132,4 +134,42 @@ body {
 }
 .animate-fade-in-up {
   animation: fade-in-up 0.35s ease both;
+}
+
+@keyframes shake-x {
+  10%,
+  90% {
+    transform: translateX(-2px);
+  }
+  20%,
+  80% {
+    transform: translateX(3px);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translateX(-6px);
+  }
+  40%,
+  60% {
+    transform: translateX(6px);
+  }
+}
+.animate-shake {
+  animation: shake-x 0.42s ease;
+}
+
+@keyframes pop-correct {
+  0% {
+    transform: scale(0.9);
+  }
+  55% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.animate-pop {
+  animation: pop-correct 0.3s ease;
 }
