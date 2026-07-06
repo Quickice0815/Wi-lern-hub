@@ -35,7 +35,7 @@ export function MainMenu() {
       icon: '🧩',
       title: 'Strategie & Führung',
       subtitle:
-        'BCG-Matrix, Five-Forces und das Reifegradmodell der Führung selbst beschriften, Fallstudien per Drag & Drop priorisieren und Fachbegriffe im Lückentext einsetzen.',
+        'Diagramme wie BCG-Matrix, Five-Forces und das Reifegradmodell der Führung selbst beschriften, Fallstudien per Drag & Drop priorisieren und Fachbegriffe im Lückentext einsetzen.',
       meta: 'Onboarding inklusive',
       actionLabel: 'Öffnen',
       color: 'var(--strategy)',
