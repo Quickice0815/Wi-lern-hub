@@ -12,9 +12,45 @@ function normalize(v: string) {
   return v.trim().toLowerCase().replace(/\s+/g, ' ');
 }
 
+/** Erkennt Datumsangaben in gängigen Schreibweisen (dd.mm.yyyy, d/m/yyyy, yyyy-mm-dd, …). */
+function parseDateParts(v: string): { d: number; m: number; y: number } | null {
+  const s = v.trim();
+  let m = s.match(/^(\d{1,2})[.\-/](\d{1,2})[.\-/](\d{4})$/);
+  if (m) return { d: Number(m[1]), m: Number(m[2]), y: Number(m[3]) };
+  m = s.match(/^(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})$/);
+  if (m) return { d: Number(m[3]), m: Number(m[2]), y: Number(m[1]) };
+  return null;
+}
+
+/** Erkennt Beträge in gängigen Schreibweisen (1234,56 / 1.234,56 / 1234.56 / 1234). */
+function parseAmount(v: string): number | null {
+  const s = v.trim().replace(/\s/g, '').replace(/€|eur/gi, '');
+  if (!s || !/^-?[\d.,]+$/.test(s)) return null;
+  let normalized = s;
+  if (s.includes(',') && s.includes('.')) normalized = s.replace(/\./g, '').replace(',', '.');
+  else if (s.includes(',')) normalized = s.replace(',', '.');
+  const n = Number.parseFloat(normalized);
+  return Number.isNaN(n) ? null : n;
+}
+
 function matches(value: string, expected: string | string[]) {
   const candidates = Array.isArray(expected) ? expected : [expected];
-  return candidates.some((c) => normalize(c) === normalize(value));
+  const v = value.trim();
+  if (v === '') return false;
+  return candidates.some((c) => {
+    if (normalize(c) === normalize(v)) return true;
+    const cd = parseDateParts(c);
+    const vd = parseDateParts(v);
+    if (cd && vd) return cd.d === vd.d && cd.m === vd.m && cd.y === vd.y;
+    const ca = parseAmount(c);
+    const va = parseAmount(v);
+    if (ca !== null && va !== null) return ca === va;
+    return false;
+  });
+}
+
+function expectedDisplay(expected: string | string[]) {
+  return Array.isArray(expected) ? expected[0] : expected;
 }
 
 export function SapFormFill({
@@ -144,6 +180,13 @@ export function SapFormFill({
                             style={statusStyle(status)}
                           />
                         )}
+                        {status === 'wrong' && (
+                          <span className="text-[11px]" style={{ color: 'var(--bad)' }}>
+                            {field.expected === null
+                              ? 'Sollte für diese Aufgabe leer bleiben.'
+                              : `Richtig wäre: ${expectedDisplay(field.expected)}`}
+                          </span>
+                        )}
                       </label>
                     );
                   })}
@@ -179,6 +222,11 @@ export function SapFormFill({
                   );
                 })}
               </div>
+              {checked && openItemStatus() === 'wrong' && (
+                <span className="text-[11px]" style={{ color: 'var(--bad)' }}>
+                  Richtig wäre: {challenge.openItemChoices.find((c) => c.correct)?.label}
+                </span>
+              )}
             </div>
           )}
 
@@ -215,6 +263,11 @@ export function SapFormFill({
               );
             })}
           </div>
+          {checked && !allButtonsClicked && (
+            <span className="text-[11px]" style={{ color: 'var(--bad)' }}>
+              Noch anzuklicken: {challenge.buttons.filter((b) => !clicked.has(b.id)).map((b) => b.label).join(', ')}
+            </span>
+          )}
         </div>
       </div>
 
@@ -237,7 +290,7 @@ export function SapFormFill({
 
       {checked && !allCorrect && (
         <p className="text-[13px] font-semibold" style={{ color: 'var(--bad)' }}>
-          ❌ Noch nicht ganz richtig — rot markierte Felder/Buttons sind falsch, fehlend oder sollten leer bleiben.
+          ❌ Noch nicht ganz richtig — bei den rot markierten Feldern steht direkt darunter, was richtig wäre.
         </p>
       )}
 
