@@ -2,7 +2,11 @@
 // STRATEGIE & FÜHRUNG — Datenmodelle für die drei Übungstypen:
 // Diagramm-Beschriftung (Achsen/Quadranten), Fallstudien-
 // Priorisierung (Drag&Drop in eine Matrix) und Lückentext-Matching.
+// Jede Übung gehört zu einer Schwierigkeitsstufe und wird Schritt
+// für Schritt bearbeitet (immer nur ein Ziel aktiv).
 // ============================================================
+
+export type Difficulty = 'anfaenger' | 'fortgeschritten' | 'profi';
 
 export type Axis = 'x' | 'y';
 
@@ -31,6 +35,7 @@ export interface DiagramDef {
   title: string;
   subtitle: string;
   intro: string;
+  difficulty: Difficulty;
   /** CSS grid-template-columns Wert */
   columns: string;
   /** CSS grid-template-rows Wert */
@@ -40,6 +45,10 @@ export interface DiagramDef {
   axisTerms: AxisTerm[];
   slots: DiagramSlot[];
   fixedBoxes?: FixedBox[];
+  /** Zusätzliche falsche Achsenbegriffe, nur im jeweiligen Achsen-Schritt sichtbar. */
+  axisDistractors?: string[];
+  /** Zusätzliche falsche Feldbegriffe, nur in Feld-Schritten sichtbar. */
+  slotDistractors?: string[];
   accent: string;
 }
 
@@ -62,6 +71,7 @@ export interface CaseStudy {
   title: string;
   scenario: string;
   instructions: string;
+  difficulty: Difficulty;
   columns: string;
   rows: string;
   areas: string[];
@@ -81,6 +91,7 @@ export interface TermMatchSet {
   id: string;
   title: string;
   intro: string;
+  difficulty: Difficulty;
   /** Segmente in Reihenfolge; letztes Segment hat keine Lücke danach (tail-Text) */
   blanks: TermBlank[];
   tail: string;
@@ -88,3 +99,9 @@ export interface TermMatchSet {
   distractors?: { id: string; text: string }[];
   accent: string;
 }
+
+export const DIFFICULTY_INFO: Record<Difficulty, { label: string; desc: string }> = {
+  anfaenger: { label: 'Anfänger', desc: 'Bekannte, leicht verständliche Beispiele mit viel Führung.' },
+  fortgeschritten: { label: 'Fortgeschritten', desc: 'Mehr Fachbegriffe, etwas weniger Hilfestellung.' },
+  profi: { label: 'Profi', desc: 'Komplexere Anwendungsfälle und mehr Ablenker.' },
+};
