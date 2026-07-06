@@ -16,12 +16,14 @@ export function LectureDifficultySelect({
   onChoose,
   onTutorial,
   onExit,
+  onPractice,
 }: {
   chapter: LectureChapter;
   progress: LecturesProgress[string] | undefined;
   onChoose: (d: LectureDifficulty) => void;
   onTutorial: () => void;
   onExit: () => void;
+  onPractice?: () => void;
 }) {
   return (
     <div className="flex flex-col gap-[18px]">
@@ -62,6 +64,22 @@ export function LectureDifficultySelect({
             </button>
           );
         })}
+
+        {onPractice && (
+          <button
+            onClick={onPractice}
+            className="card text-left p-[18px] flex flex-col gap-2 transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.5)]"
+          >
+            <span className="text-[24px] leading-none">🖥️</span>
+            <span className="text-ink font-bold text-[17px]">SAP-Praxis</span>
+            <span className="text-sub text-[13px] leading-relaxed">
+              Einen SAP-Bildschirm ausfüllen und Fehlermeldungen aus echten Klausuraufgaben verstehen.
+            </span>
+            <span className="font-bold text-[13px] mt-1" style={{ color: chapter.color }}>
+              Starten →
+            </span>
+          </button>
+        )}
       </div>
     </div>
   );
