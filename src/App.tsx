@@ -1,7 +1,8 @@
 import { NavigatorProvider, useNavigator, type Route } from './lib/navigation';
 import { AuthProvider } from './lib/auth';
 import { BackBar, PageShell } from './components/ui';
-import { HomePage } from './Home';
+import { MainMenu } from './MainMenu';
+import { WiHubMenu } from './Home';
 import { ArticleMenu, ArticleSummary, Quiz, WorkedExample } from './modules/articles';
 import { ErmMenu, ErmFlow } from './modules/erm';
 import { NumbersGame } from './modules/numbers';
@@ -14,6 +15,8 @@ import { StrategyHub } from './modules/strategy';
 function RouteOutlet({ route }: { route: Route }) {
   const nav = useNavigator();
   switch (route.name) {
+    case 'wiHub':
+      return <WiHubMenu />;
     case 'articleMenu':
       return <ArticleMenu />;
     case 'summary':
@@ -50,7 +53,7 @@ function RouteOutlet({ route }: { route: Route }) {
 
 function AppShell() {
   const { path } = useNavigator();
-  if (path.length === 0) return <HomePage />;
+  if (path.length === 0) return <MainMenu />;
   return <RouteOutlet route={path[path.length - 1]} />;
 }
 
