@@ -35,12 +35,12 @@ const EXERCISE_INFO: Record<ExerciseKind, { icon: string; title: string; desc: s
   diagram: {
     icon: '📊',
     title: 'Diagramme beschriften',
-    desc: 'BCG-Matrix, Five-Forces & Reifegradmodell: Achsen und Felder per Drag & Drop richtig platzieren.',
+    desc: 'BCG-Matrix, Five-Forces, Reifegradmodell, Johari-Fenster, Werte-Quadrat & Porters generische Strategien: Achsen und Felder per Drag & Drop richtig platzieren.',
   },
   case: {
     icon: '🧭',
     title: 'Fallstudien priorisieren',
-    desc: 'Ein Führungsproblem lösen: Maßnahmen per Drag & Drop in die richtige Matrix-Zelle einsortieren.',
+    desc: 'Führungsprobleme lösen: Maßnahmen und Beobachtungen per Drag & Drop in die richtige Matrix-Zelle einsortieren.',
   },
   term: {
     icon: '✏️',
