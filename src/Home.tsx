@@ -6,7 +6,6 @@ import { NUM_SYSTEMS } from './modules/numbers/data';
 import { PAP_LEVELS } from './modules/pap/data';
 import { SqlLevels } from './modules/sql/data';
 import { LECTURE_CHAPTERS } from './modules/lectures/data';
-import { DIAGRAMS, CASE_STUDIES, TERM_MATCH_SETS } from './modules/strategy/data';
 
 // ============================================================
 // STARTSEITE — professionelle Landingpage. Jede Karte führt per
@@ -23,7 +22,6 @@ const numSystemCount = NUM_SYSTEMS.length;
 const papLevelCount = PAP_LEVELS.length;
 const sqlLevelCount = SqlLevels.all.length;
 const lectureChapterCount = LECTURE_CHAPTERS.length;
-const strategyExerciseCount = DIAGRAMS.length + CASE_STUDIES.length + TERM_MATCH_SETS.length;
 
 interface ModuleDef {
   icon: string;
@@ -35,7 +33,7 @@ interface ModuleDef {
   onOpen: () => void;
 }
 
-export function HomePage() {
+export function WiHubMenu() {
   const nav = useNavigator();
 
   const modules: ModuleDef[] = [
@@ -109,16 +107,6 @@ export function HomePage() {
       color: 'var(--pap-control)',
       onOpen: () => nav.push({ name: 'rasterTrainer' }),
     },
-    {
-      icon: '🧩',
-      title: 'Strategie & Führung',
-      subtitle:
-        'BCG-Matrix, Five-Forces und das Reifegradmodell der Führung selbst beschriften, Fallstudien per Drag & Drop priorisieren und Fachbegriffe im Lückentext einsetzen.',
-      meta: `${strategyExerciseCount} Übungen · Onboarding inklusive`,
-      actionLabel: 'Öffnen',
-      color: 'var(--strategy)',
-      onOpen: () => nav.push({ name: 'strategyHub' }),
-    },
   ];
 
   return (
@@ -146,15 +134,23 @@ export function HomePage() {
 }
 
 function SiteHeader() {
+  const nav = useNavigator();
   return (
     <header className="sticky top-0 z-10 backdrop-blur-md bg-bg/85 border-b border-line">
       <div className="mx-auto max-w-5xl px-5 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
+        <button
+          onClick={() => nav.popToRoot()}
+          className="flex items-center gap-2.5 group"
+          aria-label="Zurück zum Hauptmenü"
+        >
+          <span className="text-sub group-hover:text-ink transition-colors text-sm font-semibold" aria-hidden>
+            ←
+          </span>
           <div className="h-8 w-8 rounded-lg bg-entity flex items-center justify-center font-extrabold text-white text-sm shrink-0">
             W
           </div>
           <span className="font-bold text-ink tracking-tight">WI · Lern-Hub</span>
-        </div>
+        </button>
         <div className="flex items-center gap-4">
           <a
             href="#module"
@@ -179,10 +175,10 @@ function Hero() {
         Wirtschaftsinformatik verstehen, nicht nur auswendig lernen.
       </h1>
       <p className="text-sub text-[15.5px] sm:text-base mt-4 max-w-xl leading-relaxed">
-        Acht interaktive Lernprogramme in einem Hub: Fachartikel mit Quiz, ein ERM-Trainer, ein
-        Zahlensysteme-Spiel, eine PAP-Quest, ein SQL-Trainer, die Vorlesungskapitel, der
-        Raster-Trainer und Strategie & Führung. Ein Klick auf ein Themengebiet öffnet direkt das
-        passende Programm — ganz ohne Umweg.
+        Sieben interaktive Lernprogramme in einem Hub: Fachartikel mit Quiz, ein ERM-Trainer, ein
+        Zahlensysteme-Spiel, eine PAP-Quest, ein SQL-Trainer, die Vorlesungskapitel und der
+        Raster-Trainer. Ein Klick auf ein Themengebiet öffnet direkt das passende Programm — ganz
+        ohne Umweg.
       </p>
       <div className="flex flex-wrap gap-3 mt-7">
         <a href="#module" className="btn-primary inline-block">
@@ -241,7 +237,7 @@ function StatCard({ value, label }: { value: string; label: string }) {
 function StatsBar() {
   return (
     <section className="card px-4 py-2 mb-12 grid grid-cols-2 sm:grid-cols-6 divide-x divide-line">
-      <StatCard value="8" label="Programme" />
+      <StatCard value="7" label="Programme" />
       <StatCard value={`${totalQuestions}+`} label="Quizfragen" />
       <StatCard value={String(sqlLevelCount)} label="SQL-Level" />
       <StatCard value={String(papLevelCount)} label="PAP-Level" />

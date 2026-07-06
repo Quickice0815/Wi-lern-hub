@@ -6,6 +6,7 @@ import { createContext, useCallback, useContext, useMemo, useState, type ReactNo
 // URL bleibt gleich (Single Page App, "bleibt im Programm").
 // ============================================================
 export type Route =
+  | { name: 'wiHub' }
   | { name: 'articleMenu' }
   | { name: 'summary'; articleId: string }
   | { name: 'quiz'; articleId: string }
