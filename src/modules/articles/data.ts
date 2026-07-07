@@ -328,16 +328,16 @@ export const Articles: Article[] = [
           'Der Würfel verbindet die Passquote mit Entfernung des Passes, Geschwindigkeit und Ort des Passes — so entsteht ein dreidimensionales Datenmodell.',
       },
       {
-        q: 'Wann ist laut Würfel-Beispiel ein Pass besonders wertvoll/riskant?',
+        q: 'Im Original-Würfel ist ein Feld mit 100 % Passquote markiert: Pässe unter 1 m Entfernung, über 50 km/h, im Mittelfeld. Was zeigt genau dieses Beispiel?',
         options: [
-          'Kurz, langsam, im eigenen Drittel',
-          'Lang (über 50 m), schnell (über 50 km/h), nah am gegnerischen Tor',
-          'Wenn er nicht ankommt',
-          'Wenn er rückwärts gespielt wird',
+          'Dass lange, gefährliche Pässe immer die höchste Quote haben',
+          'Dass eine 100-%-Quote trotzdem wenig aussagt, wenn sie nur aus kurzen, kaum vorwärtsgerichteten und damit ungefährlichen Pässen stammt',
+          'Dass Pässe im Mittelfeld verboten sind',
+          'Dass Geschwindigkeit für die Passquote irrelevant ist',
         ],
         correct: 1,
         explain:
-          'Das dunkelgraue Würfelfeld (höchste Passquote) steht für lange, schnelle Pässe nah am Tor — die sind anspruchsvoll und wertvoll, im Gegensatz zu kurzen Pässen im Mittelfeld.',
+          'Genau dieses markierte Würfelfeld ist die Pointe: 100 % Passquote wirkt beeindruckend, stammt hier aber aus sehr kurzen, schnellen, aber kaum vorwärtsgerichteten Pässen im Mittelfeld — also ungefährlich. Erst die Kombination aller drei Achsen verrät das.',
       },
       {
         q: 'Was bewirkt das Hinzufügen der Dimension „Zeit“ zur Passquote?',
@@ -374,6 +374,66 @@ export const Articles: Article[] = [
         correct: 2,
         explain:
           'Die multidimensionale Analyse schafft einen Informationsvorsprung und hilft, unterbewertete Spieler zu finden — ersetzt die endgültige Entscheidung aber nicht.',
+      },
+      {
+        q: 'Wie ist das Datenerfassungsteam von Opta pro Mannschaft aufgebaut?',
+        options: [
+          'Ein einzelner Mitarbeiter macht alles',
+          'Drei Mitarbeiter: einer erfasst per Tastenkombination/Maus, ein zweiter ist für die zweite Mannschaft zuständig, ein dritter übernimmt die Qualitätssicherung',
+          'Ein komplett automatisches KI-System ohne Personal',
+          'Zehn Mitarbeiter pro Spieler',
+        ],
+        correct: 1,
+        explain:
+          'Opta setzt pro Mannschaft drei Mitarbeiter ein: Erfassung der Aktionen, Erfassung der zweiten Mannschaft und Qualitätssicherung.',
+      },
+      {
+        q: 'Wie werden Torschüsse bei der Datenerfassung räumlich exakt festgehalten?',
+        options: [
+          'Gar nicht, nur ob Tor oder kein Tor wird gespeichert',
+          'Mit X/Y-Koordinaten auf dem Spielfeld (105×68 m, Mittelpunkt bei 52,5/34)',
+          'Nur mit der Uhrzeit des Schusses',
+          'Mit einer Sterne-Bewertung des Schiedsrichters',
+        ],
+        correct: 1,
+        explain:
+          'Jeder Torschuss bekommt eigene X/Y-Koordinaten auf dem Spielfeld (105×68 m, Mittelpunkt = 52,5/34) — so lässt sich exakt rekonstruieren, woher geschossen wurde.',
+      },
+      {
+        q: 'Brasiliens 1:7-Niederlage gegen Deutschland bei der WM 2014 zeigt ein Kernproblem eindimensionaler Statistiken. Welches?',
+        options: [
+          'Brasilien hatte weniger Ballbesitz und weniger Schüsse — das Ergebnis war also erwartbar',
+          'Brasilien war länger im Ballbesitz und hatte mehr Schüsse aufs Tor — nach diesen Kennzahlen wäre Brasilien effizienter gewesen, das Ergebnis zeigt aber das Gegenteil',
+          'Die Statistiken waren technisch fehlerhaft erfasst',
+          'Deutschland hatte gar keine Torschüsse',
+        ],
+        correct: 1,
+        explain:
+          'Nach Ballbesitz und Schüssen aufs Tor hätte Brasilien als effizienter gegolten — das tatsächliche Ergebnis (1:7) zeigt, dass rohe, eindimensionale Statistiken genau das Gegenteil verschleiern können.',
+      },
+      {
+        q: 'Die Passquote wird im Artikel Schritt für Schritt um Dimensionen erweitert. Was zeigt sich bereits bei 2 Dimensionen (Passquote × Zielbereich)?',
+        options: [
+          'Die Gesamtquote von 80 % verteilt sich sehr ungleich: 100 % im eigenen Drittel, aber nur 50 % im gegnerischen Drittel',
+          'Die Quote ist in beiden Dritteln exakt gleich hoch',
+          'Es gibt keinen Unterschied zwischen den Dritteln',
+          'Die 2. Dimension macht die Kennzahl komplett wertlos',
+        ],
+        correct: 0,
+        explain:
+          'Erst mit der zweiten Dimension „Zielbereich“ zeigt sich: Die guten 80 % Gesamtquote kommen vor allem aus risikoarmen Pässen im eigenen Drittel — im gegnerischen Drittel liegt die Quote nur bei 50 %.',
+      },
+      {
+        q: 'Welche vier Kennzahlenbereiche schlägt der Artikel vor, um Spieler ausgewogen zu bewerten?',
+        options: [
+          'Nur Tore, nur Vorlagen, nur Zweikämpfe, nur Laufkilometer',
+          'Gefährliche Situationen schaffen, gefährliche Situationen vermeiden, Flexibilität (mehrere Positionen), physischer Output (z. B. Sprintgeschwindigkeit)',
+          'Marktwert, Alter, Vertragslaufzeit, Nationalität',
+          'Trikotnummer, Körpergröße, Schuhgröße, Lieblingsfuß',
+        ],
+        correct: 1,
+        explain:
+          'Für ein ausgewogenes Modell schlägt der Artikel vier Bereiche vor: gefährliche Situationen schaffen (Angriff), gefährliche Situationen vermeiden (Abwehr), Flexibilität und physischer Output.',
       },
     ],
   },
@@ -856,6 +916,9 @@ export type SummaryVisualKind =
   | 'dimensionshierarchien'
   | 'pivotprogression'
   | 'stammbewegung'
+  | 'datenerfassung'
+  | 'wm2014'
+  | 'passquoteprogression'
   | 'passquote'
   | 'revolutions'
   | 'taetigkeiten'
@@ -954,22 +1017,43 @@ export const Summaries: Record<string, ArticleSummaryData> = {
       { kind: 'visual', visual: 'stammbewegung' },
       {
         kind: 'text',
+        heading: 'Wie die Daten entstehen',
+        body: 'Opta setzt pro Mannschaft drei Mitarbeiter ein: einer erfasst die Aktionen per Tastenkombination und Maus, ein zweiter ist für die zweite Mannschaft zuständig, der dritte übernimmt die Qualitätssicherung. Jeder Torschuss bekommt eigene X/Y-Koordinaten auf dem Spielfeld (105×68 m, Mittelpunkt = 52,5/34) — so lässt sich exakt rekonstruieren, woher geschossen wurde.',
+      },
+      { kind: 'visual', visual: 'datenerfassung' },
+      {
+        kind: 'text',
         heading: 'Das Problem eindimensionaler Kennzahlen',
-        body: 'Eine pauschale Passquote von 95 % sagt nichts über die Qualität der Pässe. Erst Dimensionen wie Entfernung, Geschwindigkeit und Ort des Passes zeigen, ob es riskante, wertvolle Pässe nah am Tor waren oder einfache Querpässe im Mittelfeld.',
+        body: 'Eine pauschale Passquote von 95 % sagt nichts über die Qualität der Pässe. Erst Dimensionen wie Entfernung, Geschwindigkeit und Ort des Passes zeigen, ob es wirklich anspruchsvolle Pässe waren oder einfache, kaum vorwärtsgerichtete Zuspiele im Mittelfeld.',
       },
       { kind: 'visual', visual: 'passquote' },
       {
         kind: 'text',
-        heading: 'Die Zeit als vierte Dimension',
-        body: 'Fügt man die Zeit hinzu (z. B. 10-Minuten-Intervalle), erkennt man Muster im Spielverlauf: Lässt die Passquote zum Ende nach, ist das ein Indikator für Ermüdung.',
+        heading: 'Wenn Statistik täuscht: die WM 2014',
+        body: 'Brasiliens 1:7-Niederlage gegen Deutschland zeigt das Problem eindrücklich: Die brasilianische Mannschaft war länger im Ballbesitz und hatte mehr Schüsse aufs Tor — nach diesen Kennzahlen wäre Brasilien effizienter gewesen. Das Ergebnis zeigt aber, dass Deutschland das eigentlich erfolgreichere Spiel gemacht hat. Rohe, eindimensionale Statistiken lassen genau das nicht erkennen.',
+      },
+      { kind: 'visual', visual: 'wm2014' },
+      {
+        kind: 'text',
+        heading: 'Die Passquote, Schritt für Schritt aufgebohrt',
+        body: 'Genau wie beim Umsatz im anderen Artikel lässt sich auch die Passquote durch immer mehr Dimensionen anreichern: Bei 1 Dimension sagt „80 %“ nur, dass 4 von 5 Pässen ankommen. Bei 2 Dimensionen (+ Zielbereich) zeigt sich: 100 % im eigenen Drittel, aber nur 50 % im gegnerischen — die guten 80 % kommen vor allem aus risikoarmen Pässen. Bei 3 Dimensionen (+ Geschwindigkeit & Entfernung) zeigt der Würfel, unter welchen Bedingungen ein Spieler wirklich gut passt. Bei 4 Dimensionen (+ Zeit) lässt sich Ermüdung über den Spielverlauf erkennen.',
+      },
+      { kind: 'visual', visual: 'passquoteprogression' },
+      {
+        kind: 'text',
+        heading: 'Vier Kennzahlenbereiche für ein eigenes Modell',
+        body: 'Für ein ausgewogenes Bewertungsmodell schlägt der Artikel vier Kennzahlenbereiche vor: gefährliche Situationen schaffen (Angriffsaktionen mit Torschuss-Potenzial), gefährliche Situationen vermeiden (defensive Absicherung im letzten Drittel), Flexibilität (Einsetzbarkeit auf mehreren Positionen) und physischer Output (z. B. maximale Sprintgeschwindigkeit, Anzahl Sprints).',
       },
       {
         kind: 'keypoints',
         title: 'Das musst du dir merken',
         points: [
           'Stammdaten = dauerhaft (Spieler, Team) · Bewegungsdaten = je Spiel neu (Pässe)',
+          'Opta: 3 Mitarbeiter/Team · X/Y-Koordinaten je Schuss (Feld 105×68 m)',
           'Passquote = erfolgreiche Pässe / gespielte Pässe × 100',
-          'Eindimensional täuscht — erst Dimensionen (Ort, Tempo, Zeit) geben Aussagekraft',
+          'WM 2014: Brasilien führte bei Ballbesitz/Schüssen, verlor aber 1:7 — Statistik täuschte',
+          '1D „80 %“ → 2D (Zielbereich) → 3D (+ Geschw./Entfernung) → 4D (+ Zeit → Ermüdung)',
+          '4 Kennzahlenbereiche: Angriff schaffen, Abwehr sichern, Flexibilität, physischer Output',
           'Die Analyse ersetzt nicht die Entscheidung, sie unterstützt sie',
         ],
       },

@@ -31,8 +31,14 @@ function renderVisual(kind: SummaryVisualKind, _accent: string): ReactNode {
       return <PivotProgression />;
     case 'stammbewegung':
       return <StammBewegungBoxes />;
+    case 'datenerfassung':
+      return <DatenerfassungDetail />;
     case 'passquote':
       return <PassquoteCompare />;
+    case 'wm2014':
+      return <Wm2014Compare />;
+    case 'passquoteprogression':
+      return <PassquoteProgression />;
     case 'revolutions':
       return <RevolutionsTimeline />;
     case 'taetigkeiten':
@@ -267,6 +273,76 @@ function PassquoteCompare() {
           </span>
         </div>
       </div>
+    </div>
+  );
+}
+
+function DatenerfassungDetail() {
+  const roles = ['Aktionen erfassen', '2. Mannschaft erfassen', 'Qualitätssicherung'];
+  return (
+    <div className="flex flex-col gap-2.5">
+      <div className="flex gap-2">
+        {roles.map((r) => (
+          <LabeledBox key={r} title="Opta" subtitle={r} color={COLORS.attribute} />
+        ))}
+      </div>
+      <div className="flex flex-col items-center gap-1 rounded-lg bg-panel px-3 py-2.5" style={{ border: `1.5px solid ${COLORS.entity}` }}>
+        <span className="text-[11px] font-bold" style={{ color: COLORS.entity }}>
+          X/Y-Koordinate je Torschuss
+        </span>
+        <span className="text-sub text-[10.5px]">Feld 105×68 m · Mittelpunkt = 52,5/34</span>
+      </div>
+    </div>
+  );
+}
+
+function Wm2014Compare() {
+  return (
+    <div className="flex items-center gap-2.5">
+      <div className="flex-1 flex flex-col items-center gap-1.5">
+        <span className="text-[12px] font-bold" style={{ color: COLORS.red }}>
+          Brasilien
+        </span>
+        <div className="flex flex-col items-center gap-0.5 rounded-lg bg-panel px-2.5 py-2.5 w-full" style={{ border: `1.5px solid ${COLORS.red}` }}>
+          <span className="text-ink text-[11.5px]">mehr Ballbesitz</span>
+          <span className="text-ink text-[11.5px]">mehr Schüsse aufs Tor</span>
+          <span className="text-[12px] font-bold pt-0.5" style={{ color: COLORS.red }}>
+            Ergebnis: 1:7
+          </span>
+        </div>
+      </div>
+      <ArrowRight label="Statistik täuscht" />
+      <div className="flex-1 flex flex-col items-center gap-1.5">
+        <span className="text-[12px] font-bold" style={{ color: COLORS.attribute }}>
+          Deutschland
+        </span>
+        <div className="flex flex-col items-center gap-0.5 rounded-lg bg-panel px-2.5 py-2.5 w-full" style={{ border: `1.5px solid ${COLORS.attribute}` }}>
+          <span className="text-ink text-[11.5px]">weniger Ballbesitz</span>
+          <span className="text-ink text-[11.5px]">weniger Schüsse</span>
+          <span className="text-[12px] font-bold pt-0.5" style={{ color: COLORS.attribute }}>
+            eigentlich erfolgreicher
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PassquoteProgression() {
+  const steps: { title: string; sub: string }[] = [
+    { title: '1D — 80 %', sub: 'nur die Passquote selbst' },
+    { title: '2D — 100 % / 50 %', sub: '+ eigenes / gegnerisches Drittel' },
+    { title: '3D — Würfel', sub: '+ Geschwindigkeit & Entfernung' },
+    { title: '4D — + Zeit', sub: 'Muster über den Spielverlauf' },
+  ];
+  return (
+    <div className="flex items-center gap-1.5 overflow-x-auto">
+      {steps.map((s, i) => (
+        <div key={s.title} className="flex items-center gap-1.5 shrink-0">
+          <LabeledBox title={s.title} subtitle={s.sub} color={COLORS.attribute} width={124} />
+          {i < steps.length - 1 && <ArrowRight color={COLORS.attribute} />}
+        </div>
+      ))}
     </div>
   );
 }
