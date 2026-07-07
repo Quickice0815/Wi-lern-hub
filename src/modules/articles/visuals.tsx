@@ -35,10 +35,16 @@ function renderVisual(kind: SummaryVisualKind, _accent: string): ReactNode {
       return <BerichtswesenFlow />;
     case 'duplicate':
       return <DuplicateDiagram />;
+    case 'suchprozess':
+      return <SuchprozessFlow />;
     case 'shingles':
       return <ShinglesStack />;
     case 'jaccard':
       return <JaccardVenn />;
+    case 'originalkriterien':
+      return <OriginalkriterienList />;
+    case 'duplikatsgrad':
+      return <DuplikatsgradBar />;
     case 'pyramide':
       return <InfoPyramid />;
     case 'gedaechtnis':
@@ -336,7 +342,80 @@ function JaccardVenn() {
           <span>nur B</span>
         </div>
       </div>
-      <span className="text-sub text-[11.5px]">Beispiel: 3 / 9 = 33 %  ·  ab 40 % = Duplikat</span>
+      <span className="text-sub text-[11.5px]">Beispiel: 3 / 9 = 33 %</span>
+    </div>
+  );
+}
+
+function SuchprozessFlow() {
+  const steps: { title: string; sub: string }[] = [
+    { title: 'Crawlen', sub: 'Googlebot folgt Links' },
+    { title: 'Indexieren', sub: 'Wörter → Index-Tabelle' },
+    { title: 'Suche', sub: 'Keyword → Treffer filtern' },
+    { title: 'Ranking', sub: 'Algorithmus sortiert' },
+  ];
+  return (
+    <div className="flex items-center gap-1.5">
+      {steps.map((s, i) => (
+        <div key={s.title} className="flex items-center gap-1.5 shrink-0">
+          <LabeledBox title={`${i + 1}. ${s.title}`} subtitle={s.sub} color={COLORS.purple} width={104} />
+          {i < steps.length - 1 && <ArrowRight color={COLORS.purple} />}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function OriginalkriterienList() {
+  const items = [
+    { title: 'Indexierungsdatum', sub: 'wer zuerst indexiert wurde, gilt als Original' },
+    { title: 'Reputation', sub: 'etablierte Seiten werden seltener verdächtigt' },
+    { title: 'Eingehende Quellverweise', sub: 'die Seite, auf die andere verlinken' },
+  ];
+  return (
+    <div className="flex flex-col gap-1.5">
+      {items.map((it) => (
+        <div
+          key={it.title}
+          className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2.5 rounded-lg bg-panel px-3 py-2"
+          style={{ border: `1.5px solid ${COLORS.purple}` }}
+        >
+          <span className="text-[12.5px] font-bold text-ink shrink-0">{it.title}</span>
+          <span className="text-sub text-[10.5px]">{it.sub}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function DuplikatsgradBar() {
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex w-full h-9 rounded-lg overflow-hidden" style={{ border: `1.5px solid ${COLORS.purple}` }}>
+        <div
+          className="flex items-center justify-center text-[10px] font-bold text-ink"
+          style={{ width: '40%', background: `color-mix(in srgb, ${COLORS.attribute} 25%, transparent)` }}
+        >
+          0–40 %
+        </div>
+        <div
+          className="flex items-center justify-center text-[10px] font-bold text-ink"
+          style={{ width: '20%', background: `color-mix(in srgb, ${COLORS.relation} 35%, transparent)` }}
+        >
+          40–60 %
+        </div>
+        <div
+          className="flex items-center justify-center text-[10px] font-bold text-ink"
+          style={{ width: '40%', background: `color-mix(in srgb, ${COLORS.red} 25%, transparent)` }}
+        >
+          &gt; 60 %
+        </div>
+      </div>
+      <div className="flex text-[9.5px] text-sub text-center">
+        <span style={{ width: '40%' }}>beide Seiten geranked</span>
+        <span style={{ width: '20%' }}>Grauzone</span>
+        <span style={{ width: '40%' }}>Original wird unklar</span>
+      </div>
     </div>
   );
 }
