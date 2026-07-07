@@ -178,6 +178,66 @@ export const Articles: Article[] = [
         explain:
           'Die hierarchische Ordnung verläuft von fein zu grob: Tag → Woche → Monat → Quartal → Jahr. Der Wertebereich einer Ebene heißt Domäne.',
       },
+      {
+        q: 'Warum werden strategische Aspekte in OLTP-Systemen nur nachrangig berücksichtigt?',
+        options: [
+          'Weil OLTP-Systeme technisch keine Zahlen speichern können',
+          'Weil sie auf effiziente Abwicklung des Tagesgeschäfts ausgelegt sind — Daten, die nur für die strategische Auswertung wichtig wären, aber für die Abwicklung selbst irrelevant sind, fließen gar nicht erst ein',
+          'Weil das Management strategische Daten verbietet',
+          'Weil OLTP-Systeme nur einmal im Jahr aktualisiert werden',
+        ],
+        correct: 1,
+        explain:
+          'OLTP-Systeme wickeln den operativen Ablauf ab (Aufträge erfassen, Rechnungen buchen). Was für die reine Abwicklung nicht gebraucht wird, aber für strategische Bewertung wichtig wäre (z. B. Kundenzufriedenheit), wird erst gar nicht erfasst — daraus entsteht eine Lücke, die erst über Kennzahlen geschlossen wird.',
+      },
+      {
+        q: 'Ein einzelner Kassenbon beim Bäcker ist ein operativer Datensatz. Wofür reicht er aus, wofür nicht?',
+        options: [
+          'Er reicht für gar nichts aus',
+          'Er reicht für die Kassenabwicklung des einen Kaufvorgangs, ist aber wertlos für die Frage „Wie läuft unser Laden insgesamt?“',
+          'Er beantwortet beide Fragen gleich gut',
+          'Er ist nur für die strategische Auswertung nützlich',
+        ],
+        correct: 1,
+        explain:
+          'Für die Kassenabwicklung eines einzelnen Kaufs reicht der Bon völlig. Für die strategische Frage nach der Gesamtlage bräuchtest du tausend Bons und eine Zusammenfassung — genau das leistet die multidimensionale Analyse.',
+      },
+      {
+        q: 'Die Attribute ERDAT (Erfassungsdatum) und VBELN (Belegnummer) haben beide eine erkennbare Reihenfolge. Trotzdem unterscheidet sich ihr Skalenniveau. Warum?',
+        options: [
+          'Beide sind nominalskaliert, Reihenfolgen spielen keine Rolle',
+          'ERDAT ist kardinal (der Abstand zwischen zwei Tagen ist exakt messbar), VBELN ist nur ordinal (man weiß nicht, wie viele Aufträge zwischen zwei Belegnummern liegen)',
+          'ERDAT ist ordinal, VBELN ist kardinal',
+          'Beide sind kardinal, weil beide Zahlen enthalten',
+        ],
+        correct: 1,
+        explain:
+          'Zwischen zwei Datumswerten liegen exakt gleich lange, messbare Abstände (1 Tag = 1 Tag) → kardinal. Bei VBELN kennt man zwar die Reihenfolge, aber nicht den Abstand zwischen zwei Nummern → nur ordinal.',
+      },
+      {
+        q: 'Welche Hierarchisierungsebenen passen zur Dimension „Raum“?',
+        options: [
+          'Mitarbeiter → Abteilung → Filiale',
+          'Filiale → Stadt → Bezirk → Bundesland → Land',
+          'Ansprechpartner → Abteilung → Firma',
+          'Tag → Woche → Monat',
+        ],
+        correct: 1,
+        explain:
+          'Die Dimension Raum lässt sich von fein zu grob hierarchisieren: Filiale → Stadt → Bezirk → Bundesland → Land. Mitarbeiter und Kunde haben jeweils eigene Hierarchien.',
+      },
+      {
+        q: 'Welcher Kennzahlen-Vorschlag zum Attribut NETWR (Nettowert) misst, wie „gleichmäßig“ die Auftragswerte verteilt sind?',
+        options: [
+          'Durchschnittlicher Auftragswert',
+          'Streuung des Auftragswerts (Standardabweichung)',
+          'Umsatzanteil je Auftragsart',
+          'Maximaler Auftragswert',
+        ],
+        correct: 1,
+        explain:
+          'Die Standardabweichung (Streuung) zeigt, wie gleichmäßig oder ungleichmäßig Auftragswerte um den Durchschnitt verteilt sind — eine von mehreren zusätzlichen Kennzahlen, die sich aus einem einzigen Attribut ableiten lassen.',
+      },
     ],
   },
   {
@@ -792,6 +852,9 @@ export type SummaryVisualKind =
   | 'verdichtung'
   | 'skalen'
   | 'wuerfel'
+  | 'oltpluecke'
+  | 'dimensionshierarchien'
+  | 'pivotprogression'
   | 'stammbewegung'
   | 'passquote'
   | 'revolutions'
@@ -834,6 +897,12 @@ export const Summaries: Record<string, ArticleSummaryData> = {
       { kind: 'visual', visual: 'verdichtung' },
       {
         kind: 'text',
+        heading: 'Die Lücke zwischen operativ und strategisch',
+        body: 'Ein Kassenbon beim Bäcker ist ein operativer Datensatz — er dokumentiert exakt einen Kaufvorgang, und für die Kassenabwicklung reicht das völlig. Für die Frage „Wie läuft unser Laden insgesamt?“ ist ein einzelner Bon aber wertlos — du bräuchtest tausend Bons und eine Zusammenfassung. OLTP-Systeme sind fürs Tagesgeschäft optimiert, nicht fürs strategische Nachdenken: Daten, die nur für die strategische Auswertung wichtig wären (z. B. Kundenzufriedenheit), aber für die Abwicklung selbst irrelevant sind, werden dort gar nicht erst erfasst. Zur Abwicklung eines einzigen SAP-Kundenauftrags braucht es übrigens schon 135 Attribute auf Belegkopf- und 213 auf Belegpositionsebene.',
+      },
+      { kind: 'visual', visual: 'oltpluecke' },
+      {
+        kind: 'text',
         heading: 'Skalenniveau entscheidet über die Mathematik',
         body: 'Welche Verdichtung erlaubt ist, hängt vom Skalenniveau ab: Nominaldaten (Kategorien ohne Rang) erlauben nur den Modus, Ordinaldaten (Rang, ungleiche Abstände) zusätzlich den Median, Kardinaldaten (gleiche Abstände) auch Summe und Durchschnitt.',
       },
@@ -845,12 +914,26 @@ export const Summaries: Record<string, ArticleSummaryData> = {
       },
       { kind: 'visual', visual: 'wuerfel' },
       {
+        kind: 'text',
+        heading: 'Hierarchien: nicht nur bei der Zeit',
+        body: 'Nicht nur die Zeit-Dimension lässt sich von fein zu grob hierarchisieren — das geht bei fast jeder Dimension. Raum, Mitarbeiter und Kunde haben jeweils eigene Hierarchisierungsebenen, entlang derer man eine Kennzahl auf- oder abrollen kann (z. B. vom Umsatz einer einzelnen Filiale hoch zum Umsatz eines ganzen Bundeslandes).',
+      },
+      { kind: 'visual', visual: 'dimensionshierarchien' },
+      {
+        kind: 'text',
+        heading: 'Vom eindimensionalen Blick zum vollen Bild',
+        body: 'Je mehr Dimensionen man einer Kennzahl gleichzeitig zuweist, desto mehr Erkenntnis gewinnt man — allerdings auch desto komplexer wird die Darstellung. Am Beispiel „Gesamtumsatz: 3.813,92 €“: Erst mit Mitarbeiter als Dimension erkennt man Arbeitsteilung, erst mit Auftragsart zusätzlich sieht man WER WAS bearbeitet, und mit Zeit als Filter zusätzlich, wer WANN aktiv war. Es gibt keine Obergrenze für die Anzahl der Dimensionen — mit Excel-Pivot-Tabellen wird das aber schnell unübersichtlich, weshalb dedizierte OLAP-Tools (Online Analytical Processing) zum Einsatz kommen, sobald mehrere Kennzahlen gleichzeitig analysiert werden sollen.',
+      },
+      { kind: 'visual', visual: 'pivotprogression' },
+      {
         kind: 'keypoints',
         title: 'Das musst du dir merken',
         points: [
           'Operative Daten → Kennzahlen (verdichten) → + Dimensionen (Aussagekraft)',
           'Nominal = nur Modus · Ordinal = + Median · Kardinal = + Durchschnitt/Summe',
+          'OLTP optimiert fürs Tagesgeschäft, nicht fürs strategische Auswerten — die Lücke wird über Kennzahlen geschlossen',
           'Drei Dimensionsarten: zeitlich, räumlich, sachlich',
+          'Fast jede Dimension lässt sich hierarchisieren (Raum, Mitarbeiter, Kunde, Zeit …)',
           '60–80 % aller Unternehmensdaten haben einen Raumbezug',
         ],
       },
@@ -1115,6 +1198,14 @@ export const WorkedExamples: Record<string, WorkedExampleDataT> = {
       {
         h: 'Beispiel Nettowert (NETWR)',
         t: 'Geldbeträge haben gleiche Abstände (1 € = 1 €) → kardinal. Erlaubt: alles, inkl. Summe (Gesamtumsatz) und Durchschnitt.',
+      },
+      {
+        h: 'Die Falle: ERDAT vs. VBELN',
+        t: 'Beide Attribute haben eine erkennbare Reihenfolge — trotzdem ist nur eines kardinal. ERDAT (Erfassungsdatum): Der Abstand zwischen zwei Tagen ist exakt messbar (1 Tag = 1 Tag) → kardinal.',
+      },
+      {
+        h: 'VBELN ist nur ordinal',
+        t: 'VBELN (Belegnummer) zeigt zwar auch eine Reihenfolge, aber man weiß nicht, wie viele Aufträge zwischen zwei Belegnummern liegen — der Abstand ist nicht messbar → nur ordinal, kein Durchschnitt erlaubt.',
       },
     ],
     exercise: {
