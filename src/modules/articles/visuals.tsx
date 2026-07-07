@@ -23,6 +23,12 @@ function renderVisual(kind: SummaryVisualKind, _accent: string): ReactNode {
       return <SkalenCards />;
     case 'wuerfel':
       return <DimensionCube />;
+    case 'oltpluecke':
+      return <OltpLueckeCompare />;
+    case 'dimensionshierarchien':
+      return <DimensionsHierarchien />;
+    case 'pivotprogression':
+      return <PivotProgression />;
     case 'stammbewegung':
       return <StammBewegungBoxes />;
     case 'passquote':
@@ -156,6 +162,70 @@ function DimensionCube() {
       <span className="text-[11px] font-bold" style={{ color: COLORS.attribute }}>
         Zeit
       </span>
+    </div>
+  );
+}
+
+function OltpLueckeCompare() {
+  return (
+    <div className="flex items-center gap-2.5">
+      <div className="flex-1 flex flex-col items-center gap-1.5">
+        <span className="text-[12px] font-bold" style={{ color: COLORS.red }}>
+          1 Kassenbon
+        </span>
+        <div className="flex flex-col items-center gap-0.5 rounded-lg bg-panel px-2.5 py-2.5" style={{ border: `1.5px solid ${COLORS.red}` }}>
+          <span className="text-ink text-[12.5px] font-bold">Ein Kaufvorgang</span>
+          <span className="text-sub text-[10.5px]">reicht für die Kasse</span>
+        </div>
+      </div>
+      <ArrowRight label="+ 999 andere" />
+      <div className="flex-1 flex flex-col items-center gap-1.5">
+        <span className="text-[12px] font-bold" style={{ color: COLORS.attribute }}>
+          Tausend Bons
+        </span>
+        <div className="flex flex-col items-center gap-0.5 rounded-lg bg-panel px-2.5 py-2.5" style={{ border: `1.5px solid ${COLORS.attribute}` }}>
+          <span className="text-ink text-[12.5px] font-bold">Zusammenfassung</span>
+          <span className="text-sub text-[10.5px]">„Wie läuft der Laden?“</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DimensionsHierarchien() {
+  const rows = [
+    { dim: 'Raum', chain: 'Filiale → Stadt → Bezirk → Bundesland → Land', color: COLORS.pk },
+    { dim: 'Mitarbeiter', chain: 'Mitarbeiter → Abteilung → Filiale', color: COLORS.attribute },
+    { dim: 'Kunde', chain: 'Ansprechpartner → Abteilung → Firma', color: COLORS.entity },
+  ];
+  return (
+    <div className="flex flex-col gap-1.5">
+      {rows.map((r) => (
+        <div key={r.dim} className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2.5 rounded-lg bg-panel px-3 py-2" style={{ border: `1.5px solid ${r.color}` }}>
+          <span className="text-[12.5px] font-bold text-ink shrink-0 w-[90px]" style={{ color: r.color }}>
+            {r.dim}
+          </span>
+          <span className="text-sub text-[10.5px]">{r.chain}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PivotProgression() {
+  const steps: { title: string; sub: string }[] = [
+    { title: '1 Dimension', sub: 'Umsatz je Mitarbeiter' },
+    { title: '2 Dimensionen', sub: '+ Auftragsart (wer macht was)' },
+    { title: '3 Dimensionen', sub: '+ Zeit-Filter (wer war wann aktiv)' },
+  ];
+  return (
+    <div className="flex items-center gap-1.5">
+      {steps.map((s, i) => (
+        <div key={s.title} className="flex items-center gap-1.5 shrink-0">
+          <LabeledBox title={s.title} subtitle={s.sub} color={COLORS.entity} width={128} />
+          {i < steps.length - 1 && <ArrowRight color={COLORS.entity} />}
+        </div>
+      ))}
     </div>
   );
 }
