@@ -539,6 +539,30 @@ export const Articles: Article[] = [
           'Vom ersten Wort an werden 3 Wörter genommen, dann ab dem zweiten Wort wieder 3, dann ab dem dritten usw. — überlappend, bis das letzte Wort das Satzende bildet.',
       },
       {
+        q: 'In welcher Reihenfolge laufen die vier Schritte ab, mit denen Google zu organischen Suchergebnissen kommt?',
+        options: [
+          'Ranking → Suche → Indexieren → Crawlen',
+          'Crawlen → Indexieren → Suche → Ranking',
+          'Indexieren → Crawlen → Ranking → Suche',
+          'Suche → Crawlen → Ranking → Indexieren',
+        ],
+        correct: 1,
+        explain:
+          'Erst folgt der Googlebot Links (Crawlen), dann landen die gefundenen Wörter im Index (Indexieren), ein Keyword filtert passende Treffer (Suche), und zuletzt legt ein Algorithmus die Reihenfolge fest (Ranking).',
+      },
+      {
+        q: 'Was passiert mit einer Seite, die Google als Duplikat eines bereits bekannten Originals einstuft?',
+        options: [
+          'Sie wird komplett aus dem Internet gelöscht',
+          'Sie wandert in den Supplemental Index — eine Art zweite Reihe, die in der normalen Suche kaum auftaucht',
+          'Sie erscheint automatisch auf Platz 1',
+          'Sie wird in eine andere Sprache übersetzt',
+        ],
+        correct: 1,
+        explain:
+          'Erkennt Google beim Crawlen einen stark ähnlichen Text, bestimmt es das mutmaßliche Original und verschiebt die Duplikate in den Supplemental Index, der in normalen Suchergebnissen kaum sichtbar ist.',
+      },
+      {
         q: 'Womit wird der Übereinstimmungsgrad zweier Texte berechnet?',
         options: ['Mit dem Pythagoras-Satz', 'Mit dem Jaccard-Koeffizienten', 'Mit dem Mittelwert', 'Mit dem Modus'],
         correct: 1,
@@ -565,35 +589,52 @@ export const Articles: Article[] = [
           'Der Jaccard-Koeffizient ist mit dem Duplikatsgrad identisch: je höher der Wert, desto ähnlicher (mehr Duplicate Content) sind die Texte.',
       },
       {
-        q: 'Ab welchem Duplikatsgrad behandelt Google laut Test-Fazit Seiten als Duplikat?',
-        options: ['Ab 10 %', 'Bis zu 40 % gilt als Original, darüber als Duplikat', 'Erst ab 90 %', 'Nie'],
-        correct: 1,
+        q: 'Wie sehen die drei Zonen aus einem Test mit 20 Domains zum Duplikatsgrad aus?',
+        options: [
+          'Bis 40 % beide Seiten geranked, 40–60 % Grauzone, über 60 % wird das Original unklar',
+          'Immer nur eine Seite wird geranked',
+          'Bis 90 % beide Seiten geranked, danach Duplikat',
+          'Der Duplikatsgrad spielt für das Ranking keine Rolle',
+        ],
+        correct: 0,
         explain:
-          'Der Test zeigt: bis ~40 % Duplikatsgrad werden beide Seiten als Original gerankt. Werbetext sollte daher mind. 60 % originellen (unique) Inhalt enthalten.',
+          'Bis 40 % Duplikatsgrad rankt Google noch beide Seiten. Zwischen 40 % und 60 % liegt eine Grauzone. Über 60 % wird unklar, welche Seite das Original ist — die Kopie kann sogar besser ranken. Werbetexte sollten daher mind. 60 % einzigartigen Inhalt haben.',
       },
       {
-        q: 'Welches Kriterium nutzen Suchmaschinen zur Bestimmung des Originals?',
+        q: 'Welche drei Kriterien nutzen Suchmaschinen zusammen, um das Original zweier fast identischer Texte zu bestimmen?',
         options: [
-          'Die längste Seite gewinnt',
-          'Das früheste Indexierungsdatum (zeitlich zuerst indexiert)',
-          'Die Seite mit den meisten Bildern',
-          'Zufall',
+          'Textlänge, Schriftart, Farbschema',
+          'Indexierungsdatum, Reputation des Anbieters, eingehende Quellverweise',
+          'Ladezeit, Serverstandort, Domainalter',
+          'Anzahl Bilder, Anzahl Links, Dateigröße',
         ],
         correct: 1,
         explain:
-          'Kriterien sind u. a. das früheste Indexierungsdatum, Reputation des Anbieters und eingehende Quellverweise (Links). Das Imitat folgt zeitlich auf das Original.',
+          'Alle drei Kriterien zusammen entscheiden: das (früheste) Indexierungsdatum, die Reputation der Seite und eingehende Quellverweise (Links), auf die andere Seiten verweisen.',
       },
       {
-        q: 'Warum kann das Indexierungsdatum zu Problemen bei der Originalbestimmung führen?',
+        q: 'Warum kann das Indexierungsdatum allein zu Problemen bei der Originalbestimmung führen?',
         options: [
-          'Weil der Zeitpunkt des Online-Stellens keine Rolle spielt — ein Plagiat kann zuerst indexiert werden',
+          'Weil es nur zeigt, wann Google eine Seite entdeckt hat — nicht, wann der Inhalt geschrieben wurde',
           'Weil Datumsangaben verboten sind',
           'Weil es immer korrekt ist',
           'Weil Google kein Datum speichert',
         ],
         correct: 0,
         explain:
-          'Maßgeblich ist nur, wann die Seite indexiert (gecrawlt) wurde, nicht wann sie online ging. Ein Plagiat kann früher gecrawlt werden und so fälschlich als Original gelten.',
+          'Maßgeblich ist nur, wann die Seite indexiert (gecrawlt) wurde, nicht wann sie online ging. Eine Kopie kann schneller gecrawlt werden als das echte Original, z. B. weil sie in einer Sitemap gelistet ist — und so fälschlich als Original gelten.',
+      },
+      {
+        q: 'Zwei Texte ergeben bei Shingle-Länge 4 jeweils 5 Shingles, davon 2 gemeinsam (Vereinigungsmenge = 8). Bei Shingle-Länge 3 lag der Jaccard-Koeffizient bei 33,3 %. Wie verändert sich der Wert bei Länge 4, und was zeigt das?',
+        options: [
+          'Er steigt auf 50 % — längere Shingles finden immer mehr Übereinstimmungen',
+          'Er sinkt auf 25 % (2/8) — je größer die Shingle-Länge, desto strenger die Prüfung',
+          'Er bleibt exakt gleich, die Shingle-Länge hat keinen Einfluss',
+          'Er wird negativ, da zu wenige Shingles existieren',
+        ],
+        correct: 1,
+        explain:
+          '2 gemeinsame Shingles / 8 Shingles in der Vereinigungsmenge = 25 %. Das ist weniger als die 33,3 % bei Länge 3: Je größer die Shingle-Länge, desto strenger die Prüfung — schon kleine Umstellungen wirken sich stärker aus.',
       },
     ],
   },
@@ -757,8 +798,11 @@ export type SummaryVisualKind =
   | 'taetigkeiten'
   | 'berichtswesen'
   | 'duplicate'
+  | 'suchprozess'
   | 'shingles'
   | 'jaccard'
+  | 'originalkriterien'
+  | 'duplikatsgrad'
   | 'pyramide'
   | 'gedaechtnis'
   | 'faces';
@@ -895,29 +939,49 @@ export const Summaries: Record<string, ArticleSummaryData> = {
       {
         kind: 'text',
         heading: 'Duplicate Content & SEO',
-        body: 'Erscheint ein Inhalt unter mehreren URLs (z. B. durch Kategorisierung oder Scraping), wertet die Suchmaschine Duplikate ab und zeigt nur das Original gut platziert. SEO sorgt dafür, in den organischen (nicht bezahlten) Ergebnissen vorne zu landen.',
+        body: 'Erscheint ein Inhalt unter mehreren URLs (z. B. durch Kategorisierung, Paginierung oder Scraping), wertet die Suchmaschine Duplikate ab und zeigt nur das Original gut platziert. Intern passiert das innerhalb der eigenen Domain, extern auf fremden Websites. SEO sorgt dafür, in den organischen (nicht bezahlten) Ergebnissen vorne zu landen.',
       },
       { kind: 'visual', visual: 'duplicate' },
       {
         kind: 'text',
+        heading: 'Wie Google Ergebnisse überhaupt sortiert',
+        body: 'Damit organische Treffer entstehen, durchläuft Google vier Schritte: Crawlen (der Googlebot folgt Links von Seite zu Seite), Indexieren (gefundene Wörter landen in einer riesigen Tabelle), Suche (ein Keyword filtert passende Treffer aus dem Index) und Ranking (ein geheimer Algorithmus legt die Reihenfolge fest). Nur das Ranking der organischen Treffer ist kostenlos — bezahlte Treffer (z. B. Google Ads) erscheinen unabhängig von ihrer Relevanz.',
+      },
+      { kind: 'visual', visual: 'suchprozess' },
+      {
+        kind: 'text',
         heading: 'Shingles: überlappende Wortfenster',
-        body: 'Ein Text wird in „Shingles“ zerlegt — überlappende Gruppen von z. B. 3 aufeinanderfolgenden Wörtern. Man nimmt 3 Wörter, rückt um eins weiter, nimmt wieder 3, wie Dachschindeln, die sich überlappen.',
+        body: 'Ein Text wird in „Shingles“ zerlegt — überlappende Gruppen von z. B. 3 aufeinanderfolgenden Wörtern. Man nimmt 3 Wörter, rückt um eins weiter, nimmt wieder 3, wie Dachschindeln, die sich überlappen. Je größer die Shingle-Länge, desto strenger die Prüfung: Schon kleine Umstellungen wirken sich stärker aus.',
       },
       { kind: 'visual', visual: 'shingles' },
       {
         kind: 'text',
         heading: 'Jaccard-Koeffizient',
-        body: 'Die Ähnlichkeit ist Schnittmenge geteilt durch Vereinigungsmenge der Shingle-Mengen. Je höher der Wert, desto mehr Duplicate Content. Ab ~40 % behandelt Google Seiten als Duplikat — Werbetext sollte mind. 60 % einzigartig sein.',
+        body: 'Die Ähnlichkeit ist Schnittmenge geteilt durch Vereinigungsmenge der Shingle-Mengen. Findet Google beim Crawlen einen stark ähnlichen Text, vergleicht es ihn mit dem Bestand, bestimmt das mutmaßliche Original — und verschiebt alle Duplikate in den Supplemental Index, eine Art zweite Reihe, die in der normalen Suche kaum auftaucht.',
       },
       { kind: 'visual', visual: 'jaccard' },
+      {
+        kind: 'text',
+        heading: 'Wer gilt als Original?',
+        body: 'Findet Google zwei fast identische Texte, entscheiden drei Kriterien, welcher das Original ist. Das Indexierungsdatum ist dabei nicht unfehlbar: Es zeigt nur, wann Google eine Seite entdeckt hat — nicht, wann der Inhalt geschrieben wurde. Eine Kopie kann schneller gecrawlt werden als das echte Original, z. B. weil sie in einer Sitemap gelistet ist.',
+      },
+      { kind: 'visual', visual: 'originalkriterien' },
+      {
+        kind: 'text',
+        heading: 'Ab wann wird es zum Problem?',
+        body: 'Ein Test mit 20 Domains zeigt drei Zonen: Bis zu einem Duplikatsgrad von 40 % rankt Google noch beide Seiten. Zwischen 40 % und 60 % wird es zur Grauzone. Über 60 % wird unklar, welche Seite das Original ist — die Kopie kann sogar besser ranken. Werbetexte sollten deshalb mindestens 60 % einzigartigen Inhalt enthalten.',
+      },
+      { kind: 'visual', visual: 'duplikatsgrad' },
       {
         kind: 'keypoints',
         title: 'Das musst du dir merken',
         points: [
-          'Duplicate Content = gleicher Inhalt unter mehreren URLs',
+          'Duplicate Content = gleicher Inhalt unter mehreren URLs (intern oder extern)',
+          'Suchprozess: Crawlen → Indexieren → Suche → Ranking',
           'Shingle = überlappendes Fenster aus n Wörtern (n = Shingle-Länge)',
           'Jaccard = |Schnittmenge| / |Vereinigungsmenge|',
-          '≤ 40 % = Original · > 40 % = Duplikat (Ziel: ≥ 60 % unique)',
+          'Original-Kriterien: Indexierungsdatum, Reputation, eingehende Quellverweise',
+          '≤ 40 % = beide geranked · 40–60 % Grauzone · > 60 % Original unklar (Ziel: ≥ 60 % unique)',
         ],
       },
     ],
@@ -1009,6 +1073,14 @@ export const WorkedExamples: Record<string, WorkedExampleDataT> = {
       {
         h: 'Schritt 4 — Formel anwenden',
         t: 'Ü(A,B) = |Schnittmenge| / |Vereinigungsmenge| = 3 / 9 = 0,333 → 33,3 %.',
+      },
+      {
+        h: 'Schritt 5 — Und bei Shingle-Länge 4?',
+        t: 'Mit Shingle-Länge 4 ergeben dieselben zwei Sätze je 5 Shingles, davon nur noch 2 gemeinsame. Vereinigungsmenge = 5 + 5 − 2 = 8.',
+      },
+      {
+        h: 'Schritt 6 — Formel erneut anwenden',
+        t: 'Ü(A,B) = 2 / 8 = 0,25 → 25 %. Das ist WENIGER als die 33,3 % bei Länge 3: Je größer die Shingle-Länge, desto strenger die Prüfung — schon kleine Umstellungen wirken sich stärker auf den Übereinstimmungsgrad aus.',
       },
     ],
     exercise: {
