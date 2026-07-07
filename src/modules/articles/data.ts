@@ -896,6 +896,73 @@ export const Articles: Article[] = [
         explain:
           'Der Boxplot fasst fünf Kennzahlen zusammen: Min, 25%-Quantil, Median, 75%-Quantil, Max. Die Box (25–75 %) enthält 50 % der Beobachtungen.',
       },
+      {
+        q: 'Wer entwickelte die Chernoff Faces, wann und wo?',
+        options: [
+          'Herman Chernoff, 1973, Professor für Angewandte Mathematik in Harvard',
+          'Eduard Gerhardt, 2016, Hochschule Coburg',
+          'Ein anonymes Google-Forscherteam, 2005',
+          'Herman Chernoff, 1995, MIT',
+        ],
+        correct: 0,
+        explain:
+          '1973 entwickelte der Statistiker Herman Chernoff, Professor für Angewandte Mathematik in Harvard, die Idee, Kennzahlen als Gesicht darzustellen.',
+      },
+      {
+        q: 'Wie viele Gesichtsmerkmale lassen sich bei einem Chernoff Face maximal definieren?',
+        options: ['Bis zu 5', 'Bis zu 18', 'Genau 3', 'Unbegrenzt viele'],
+        correct: 1,
+        explain:
+          'Insgesamt lassen sich bis zu 18 Merkmale definieren (Augengröße, Augenabstand, Nasenlänge, Mundkrümmung, Ohrengröße u. v. m.) — theoretisch also bis zu 18 Kennzahlen gleichzeitig in einem Gesicht.',
+      },
+      {
+        q: 'Welche drei Schritte sind bei der Konstruktion eines Chernoff Face notwendig, bevor die Kennzahlen dargestellt werden können?',
+        options: [
+          'Zeichnen, Drucken, Verteilen',
+          'Auswahl der Kennzahlen → Zuordnung zu je einem Gesichtsmerkmal → Normierung auf eine einheitliche Skala',
+          'Nur Normierung, der Rest ist automatisch',
+          'Befragung, Auswertung, Präsentation',
+        ],
+        correct: 1,
+        explain:
+          'Erst wird ausgewählt, welche Kennzahlen dargestellt werden sollen, dann bekommt jede Kennzahl fest ein Gesichtsmerkmal zugewiesen, und zuletzt werden alle Kennzahlen auf eine einheitliche Skala (z. B. 0–1) normiert.',
+      },
+      {
+        q: 'Warum müssen Kennzahlen vor der Zuordnung zu einem Gesichtsmerkmal normiert werden?',
+        options: [
+          'Weil Gesichter sonst nicht symmetrisch aussehen',
+          'Weil Kennzahlen unterschiedliche Einheiten (Euro, Prozent, Stück) haben und erst auf eine gemeinsame Skala gebracht werden müssen, bevor sie auf eine Merkmalsausprägung übertragen werden können',
+          'Weil sonst zu wenige Merkmale zur Verfügung stehen',
+          'Normierung ist nicht notwendig',
+        ],
+        correct: 1,
+        explain:
+          'Da Kennzahlen unterschiedliche Einheiten und Wertebereiche haben, werden sie zunächst auf eine einheitliche Skala (z. B. 0 bis 1) gebracht und erst dann auf die Merkmalsausprägung (z. B. kleinste bis größte Augengröße) übertragen.',
+      },
+      {
+        q: 'Im Hochschulen-Beispiel (Weiterempfehlungsquote, Absolventenquote, Betreuungsrelation, Drop-Out-Quote) hat Hochschule A durchgehend hohe Werte, Hochschule C durchgehend niedrige. Was zeigen die zugehörigen Chernoff Faces?',
+        options: [
+          'Beide Gesichter sehen identisch aus',
+          'Hochschule A wirkt insgesamt fröhlich/gut, Hochschule C wirkt insgesamt besorgt/schlecht — erkennbar, ohne eine einzige Zahl zu lesen',
+          'Nur Hochschule B ist überhaupt darstellbar',
+          'Die Gesichter zeigen nur die Absolventenquote',
+        ],
+        correct: 1,
+        explain:
+          'Ohne eine einzige Zahl zu lesen, erkennt man am Gesichtsausdruck auf einen Blick: A schneidet insgesamt gut ab, C eher schlecht — B liegt dazwischen. Das ist der Kerneffekt von Chernoff Faces beim Vergleich mehrerer Objekte.',
+      },
+      {
+        q: 'Welcher Nachteil der Chernoff Faces wird im Artikel besonders betont?',
+        options: [
+          'Sie sind zu teuer in der Erstellung',
+          'Die Zuordnung Kennzahl → Merkmal ist subjektiv, manche Merkmale wirken emotional stärker als andere, und es lassen sich keine exakten Werte ablesen',
+          'Sie funktionieren nur mit genau einer Kennzahl',
+          'Sie sind gesetzlich verboten',
+        ],
+        correct: 1,
+        explain:
+          'Wer das Gesicht konstruiert, kann dieselbe Kennzahl einem anderen Merkmal zuordnen (subjektiv); Merkmale wie Mund/Augen wirken emotional stärker als z. B. Ohren; und aus einem Gesicht lassen sich nur Tendenzen, keine exakten Werte ablesen.',
+      },
     ],
   },
 ];
@@ -931,7 +998,11 @@ export type SummaryVisualKind =
   | 'duplikatsgrad'
   | 'pyramide'
   | 'gedaechtnis'
-  | 'faces';
+  | 'faces'
+  | 'chernoffmerkmale'
+  | 'chernoffkonstruktion'
+  | 'chernoffhochschulen'
+  | 'chernoffprocontra';
 
 export type SummaryBlock =
   | { kind: 'lead'; text: string }
@@ -1179,13 +1250,40 @@ export const Summaries: Record<string, ArticleSummaryData> = {
       },
       { kind: 'visual', visual: 'faces' },
       {
+        kind: 'text',
+        heading: 'Herman Chernoff, 1973: bis zu 18 Merkmale',
+        body: '1973 entwickelte der Statistiker Herman Chernoff, Professor für Angewandte Mathematik in Harvard, die Idee: Menschen erkennen kleinste Unterschiede in Mimik blitzschnell und intuitiv — viel schneller als beim Vergleich von Zahlenkolonnen. Jedes Merkmal eines schematischen Gesichts (Augengröße, Augenabstand, Augenneigung, Augenbrauenhöhe und -neigung, Nasenlänge, Mundkrümmung, Mundbreite, Gesichtsform und -breite, Ohrengröße …) bekommt genau eine Kennzahl zugewiesen — insgesamt bis zu 18 Merkmale, also theoretisch 18 Kennzahlen gleichzeitig in einem einzigen Gesicht.',
+      },
+      { kind: 'visual', visual: 'chernoffmerkmale' },
+      {
+        kind: 'text',
+        heading: 'So entsteht ein Chernoff Face',
+        body: 'Bevor Kennzahlen zu einem Gesicht werden können, sind drei Schritte nötig: Auswahl (welche Kennzahlen sollen überhaupt dargestellt werden?), Zuordnung (jede Kennzahl bekommt genau ein Gesichtsmerkmal fest zugewiesen, z. B. Weiterempfehlungsquote → Mundkrümmung) und Normierung (da Kennzahlen unterschiedliche Einheiten wie Euro, Prozent oder Stück haben, werden sie zunächst auf eine einheitliche Skala von 0 bis 1 gebracht und erst dann auf die Merkmalsausprägung übertragen).',
+      },
+      { kind: 'visual', visual: 'chernoffkonstruktion' },
+      {
+        kind: 'text',
+        heading: 'Beispiel: drei Hochschulen im Vergleich',
+        body: 'Vier Kennzahlen (Weiterempfehlungsquote → Mundkrümmung, Absolventenquote → Augengröße, Betreuungsrelation → Augenabstand, Drop-Out-Quote → Augenbrauenneigung) reichen, um drei Hochschulen zu vergleichen. Ohne eine einzige Zahl zu lesen, erkennt man auf einen Blick: Hochschule A schneidet insgesamt gut ab, C eher schlecht — B liegt dazwischen. Genau das ist der Kerneffekt von Chernoff Faces beim Vergleich mehrerer Objekte.',
+      },
+      { kind: 'visual', visual: 'chernoffhochschulen' },
+      {
+        kind: 'text',
+        heading: 'Vorteile und Nachteile',
+        body: 'Chernoff Faces ermöglichen eine schnelle, intuitive Ganzheitswahrnehmung — Muster und Ausreißer springen beim Vergleich mehrerer Objekte sofort ins Auge. Die Kehrseite: Die Zuordnung Kennzahl → Merkmal ist subjektiv, manche Merkmale (Mund, Augen) wirken emotional stärker als andere (Ohren), exakte Werte sind nicht ablesbar, und bei sehr vielen Vergleichsobjekten wird auch die Menge an Gesichtern selbst wieder unübersichtlich.',
+      },
+      { kind: 'visual', visual: 'chernoffprocontra' },
+      {
         kind: 'keypoints',
         title: 'Das musst du dir merken',
         points: [
           'Pyramide: Signale → Daten → Informationen → Wissen',
           'Arbeitsgedächtnis: nur 3–5 Kennzahlen gleichzeitig',
-          'Chernoff Face: jede Kennzahl = ein Gesichtsmerkmal',
+          'Chernoff Face: jede Kennzahl = ein Gesichtsmerkmal (bis zu 18 möglich)',
+          'Herman Chernoff, 1973, Harvard',
+          'Konstruktion: Auswahl → Zuordnung → Normierung (0–1)',
           'Größte Aufmerksamkeit: Krümmung des Mundwinkels',
+          'Nachteil: subjektive Zuordnung, keine exakten Werte ablesbar',
         ],
       },
     ],
