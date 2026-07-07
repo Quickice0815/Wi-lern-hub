@@ -63,6 +63,14 @@ function renderVisual(kind: SummaryVisualKind, _accent: string): ReactNode {
       return <GedaechtnisFlow />;
     case 'faces':
       return <ChernoffFacesRow />;
+    case 'chernoffmerkmale':
+      return <ChernoffMerkmaleList />;
+    case 'chernoffkonstruktion':
+      return <ChernoffKonstruktionFlow />;
+    case 'chernoffhochschulen':
+      return <ChernoffHochschulenCompare />;
+    case 'chernoffprocontra':
+      return <ChernoffProContra />;
     default:
       return null;
   }
@@ -643,6 +651,98 @@ function ChernoffFacesRow() {
         <ChernoffFace mouthCurve={6} color={COLORS.attribute} label="gute Werte" />
         <ChernoffFace mouthCurve={0} color={COLORS.relation} label="neutral" />
         <ChernoffFace mouthCurve={-6} color={COLORS.red} label="Achtung!" />
+      </div>
+    </div>
+  );
+}
+
+function ChernoffMerkmaleList() {
+  const merkmale = [
+    'Augengröße',
+    'Augenabstand',
+    'Augenneigung',
+    'Augenbrauenhöhe',
+    'Augenbrauenneigung',
+    'Nasenlänge',
+    'Mundkrümmung',
+    'Mundbreite',
+    'Gesichtsform',
+    'Gesichtsbreite',
+    'Ohrengröße',
+  ];
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <div className="flex flex-wrap gap-1.5 justify-center">
+        {merkmale.map((m) => (
+          <span
+            key={m}
+            className="rounded-full px-2.5 py-1 text-[10.5px] font-semibold text-ink"
+            style={{ border: `1.5px solid ${COLORS.red}`, background: `color-mix(in srgb, ${COLORS.red} 10%, var(--panel-2))` }}
+          >
+            {m}
+          </span>
+        ))}
+      </div>
+      <span className="text-sub text-[10.5px]">… bis zu 18 Merkmale insgesamt</span>
+    </div>
+  );
+}
+
+function ChernoffKonstruktionFlow() {
+  const steps: { title: string; sub: string }[] = [
+    { title: '1. Auswahl', sub: 'welche Kennzahlen?' },
+    { title: '2. Zuordnung', sub: 'Kennzahl → 1 Merkmal' },
+    { title: '3. Normierung', sub: 'auf Skala 0–1' },
+  ];
+  return (
+    <div className="flex items-center gap-1.5">
+      {steps.map((s, i) => (
+        <div key={s.title} className="flex items-center gap-1.5 shrink-0">
+          <LabeledBox title={s.title} subtitle={s.sub} color={COLORS.red} width={116} />
+          {i < steps.length - 1 && <ArrowRight color={COLORS.red} />}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ChernoffHochschulenCompare() {
+  return (
+    <div className="flex flex-col items-center gap-2.5">
+      <span className="text-sub text-[11.5px] text-center">4 Kennzahlen → 1 Gesicht je Hochschule</span>
+      <div className="flex items-start gap-4">
+        <ChernoffFace mouthCurve={6} color={COLORS.attribute} label="Hochschule A · hohe Werte überall" />
+        <ChernoffFace mouthCurve={0} color={COLORS.relation} label="Hochschule B · gemischte Werte" />
+        <ChernoffFace mouthCurve={-6} color={COLORS.red} label="Hochschule C · niedrige Werte überall" />
+      </div>
+    </div>
+  );
+}
+
+function ChernoffProContra() {
+  const pro = ['Schnelle, intuitive Ganzheitswahrnehmung', 'Muster/Ausreißer springen sofort ins Auge'];
+  const contra = ['Zuordnung Kennzahl → Merkmal ist subjektiv', 'Manche Merkmale wirken emotional stärker', 'Keine exakten Werte ablesbar'];
+  return (
+    <div className="flex gap-2.5">
+      <div className="flex-1 flex flex-col gap-1.5 rounded-[10px] bg-panel px-2.5 py-2.5" style={{ border: `1.5px solid ${COLORS.attribute}` }}>
+        <span className="text-[11.5px] font-bold" style={{ color: COLORS.attribute }}>
+          Vorteile
+        </span>
+        {pro.map((p) => (
+          <span key={p} className="text-sub text-[10.5px]">
+            + {p}
+          </span>
+        ))}
+      </div>
+      <div className="flex-1 flex flex-col gap-1.5 rounded-[10px] bg-panel px-2.5 py-2.5" style={{ border: `1.5px solid ${COLORS.red}` }}>
+        <span className="text-[11.5px] font-bold" style={{ color: COLORS.red }}>
+          Nachteile
+        </span>
+        {contra.map((c) => (
+          <span key={c} className="text-sub text-[10.5px]">
+            − {c}
+          </span>
+        ))}
       </div>
     </div>
   );
