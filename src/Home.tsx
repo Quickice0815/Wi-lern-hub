@@ -181,7 +181,7 @@ function Hero() {
   return (
     <section className="mx-auto max-w-5xl px-5 pt-12 pb-8 sm:pt-16 sm:pb-10">
       <p className="text-relation font-bold text-xs tracking-[0.08em] mb-3">
-        WIRTSCHAFTSINFORMATIK · PROF. DR. EDUARD GERHARDT
+        WIRTSCHAFTSINFORMATIK · KLAUSURVORBEREITUNG
       </p>
       <h1 className="text-ink font-extrabold leading-[1.08] text-[34px] sm:text-[46px] max-w-2xl">
         Wirtschaftsinformatik verstehen, nicht nur auswendig lernen.
@@ -265,7 +265,6 @@ function SiteFooter() {
     <footer className="border-t border-line">
       <div className="mx-auto max-w-5xl px-5 py-8 flex flex-col sm:flex-row items-center justify-between gap-3">
         <p className="text-sub text-xs">© {new Date().getFullYear()} WI-Lern-Hub · Wirtschaftsinformatik</p>
-        <p className="text-sub text-xs">Prof. Dr. Eduard Gerhardt</p>
       </div>
     </footer>
   );

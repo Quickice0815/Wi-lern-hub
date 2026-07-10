@@ -69,10 +69,14 @@ export function MainMenu() {
           </p>
         </section>
 
-        <section className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-16">
+        <section className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-6">
           {areas.map((a, i) => (
             <AreaCard key={a.title} {...a} index={i} />
           ))}
+        </section>
+
+        <section className="pb-16">
+          <WhatsAppCommunityCard />
         </section>
       </main>
 
@@ -81,6 +85,31 @@ export function MainMenu() {
           <p className="text-sub text-xs">© {new Date().getFullYear()} Lern-Hub</p>
         </div>
       </footer>
+    </div>
+  );
+}
+
+function WhatsAppCommunityCard() {
+  const color = '#25D366';
+  return (
+    <div className="card p-5 flex flex-col sm:flex-row sm:items-center gap-4" style={{ borderColor: `color-mix(in srgb, ${color} 40%, var(--line))` }}>
+      <span className="text-3xl leading-none shrink-0">💬</span>
+      <div className="flex-1">
+        <h2 className="text-ink font-bold text-base leading-snug">Fragen oder Fehler gefunden?</h2>
+        <p className="text-sub text-sm leading-relaxed mt-1">
+          Tritt der WhatsApp-Community bei — dort könnt ihr euch gegenseitig helfen, Fehler melden und Fragen zu
+          den Lerninhalten stellen.
+        </p>
+      </div>
+      <a
+        href="https://chat.whatsapp.com/DBN4PF4DhzRBKqr3PfufXg"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="shrink-0 font-bold text-sm rounded-[9px] px-4 py-2.5 text-center text-white transition-transform hover:-translate-y-0.5"
+        style={{ backgroundColor: color }}
+      >
+        WhatsApp-Community beitreten →
+      </a>
     </div>
   );
 }
