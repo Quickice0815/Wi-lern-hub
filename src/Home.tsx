@@ -1,5 +1,6 @@
 import { useNavigator } from './lib/navigation';
 import { AuthWidget } from './components/AuthWidget';
+import { useAuth } from './lib/auth';
 import { Articles } from './modules/articles/data';
 import { ERM_TASKS } from './modules/erm/data';
 import { NUM_SYSTEMS } from './modules/numbers/data';
@@ -125,6 +126,7 @@ export function WiHubMenu() {
     <div className="min-h-screen bg-bg">
       <SiteHeader />
       <Hero />
+      <ProgressSyncHint />
       <main className="mx-auto max-w-5xl px-5">
         <section id="module" className="pb-6">
           <div className="flex items-baseline justify-between gap-4 mb-5">
@@ -196,6 +198,29 @@ function Hero() {
         <a href="#module" className="btn-primary inline-block">
           Themengebiet wählen ↓
         </a>
+      </div>
+    </section>
+  );
+}
+
+function ProgressSyncHint() {
+  const { configured, username, loading } = useAuth();
+  if (!configured || loading || username) return null;
+
+  return (
+    <section className="mx-auto max-w-5xl px-5 pb-8">
+      <div
+        className="card p-4 flex items-center gap-3"
+        style={{ borderColor: `color-mix(in srgb, var(--entity) 40%, var(--line))` }}
+      >
+        <span className="text-2xl leading-none shrink-0" aria-hidden>
+          ☁️
+        </span>
+        <p className="text-sub text-sm leading-relaxed">
+          <span className="text-ink font-semibold">Tipp:</span> Registriere dich oben rechts mit einem
+          Benutzernamen — dann bleibt dein Lernfortschritt gespeichert und ist auf jedem Gerät verfügbar,
+          egal ob Handy, Laptop oder PC.
+        </p>
       </div>
     </section>
   );
