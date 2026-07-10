@@ -3,7 +3,7 @@ import { AuthWidget } from './components/AuthWidget';
 
 // ============================================================
 // HAUPTMENÜ — echte Startseite der App. Bündelt zwei eigenständige
-// Bereiche: Wirtschaftsinformatik (die bisherigen 7 Module hinter
+// Bereiche: Wirtschaftsinformatik (die bisherigen 8 Module hinter
 // einem Untermenü) und Strategie & Führung (eigener Bereich).
 // ============================================================
 
@@ -25,8 +25,8 @@ export function MainMenu() {
       icon: '💻',
       title: 'Wirtschaftsinformatik',
       subtitle:
-        'Fachartikel mit Quiz, ERM-Trainer, Zahlensysteme, PAP-Quest, SQL-Trainer, Vorlesungskapitel und Raster-Trainer.',
-      meta: '7 Programme',
+        'Fachartikel mit Quiz, ERM-Trainer, Zahlensysteme, PAP-Quest, SQL-Trainer, Vorlesungskapitel, Raster-Trainer und Richtig-oder-Falsch-Trainer.',
+      meta: '8 Programme',
       actionLabel: 'Themengebiete öffnen',
       color: 'var(--entity)',
       onOpen: () => nav.push({ name: 'wiHub' }),
@@ -64,7 +64,7 @@ export function MainMenu() {
             Wähle deinen Lernbereich.
           </h1>
           <p className="text-sub text-[15.5px] sm:text-base mt-4 max-w-xl leading-relaxed">
-            Zwei eigenständige Bereiche, ein Zugang: Wirtschaftsinformatik mit sieben interaktiven
+            Zwei eigenständige Bereiche, ein Zugang: Wirtschaftsinformatik mit acht interaktiven
             Lernprogrammen und Strategie & Führung mit Diagrammen, Fallstudien und Lückentext-Matching.
           </p>
         </section>

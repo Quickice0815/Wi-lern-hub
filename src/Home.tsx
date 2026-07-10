@@ -6,6 +6,7 @@ import { NUM_SYSTEMS } from './modules/numbers/data';
 import { PAP_LEVELS } from './modules/pap/data';
 import { SqlLevels } from './modules/sql/data';
 import { LECTURE_CHAPTERS } from './modules/lectures/data';
+import { STATEMENTS } from './modules/truefalse/data';
 
 // ============================================================
 // STARTSEITE — professionelle Landingpage. Jede Karte führt per
@@ -22,6 +23,7 @@ const numSystemCount = NUM_SYSTEMS.length;
 const papLevelCount = PAP_LEVELS.length;
 const sqlLevelCount = SqlLevels.all.length;
 const lectureChapterCount = LECTURE_CHAPTERS.length;
+const trueFalseCount = STATEMENTS.length;
 
 interface ModuleDef {
   icon: string;
@@ -107,6 +109,16 @@ export function WiHubMenu() {
       color: 'var(--pap-control)',
       onOpen: () => nav.push({ name: 'rasterTrainer' }),
     },
+    {
+      icon: '✅',
+      title: 'Richtig oder Falsch?',
+      subtitle:
+        'Klausur-Behauptungen aus der ganzen Vorlesung: nur Ja oder Nein anklicken, die Begründung liefert die App direkt danach.',
+      meta: `${trueFalseCount} Behauptungen · gemischt`,
+      actionLabel: 'Starten',
+      color: 'var(--truefalse)',
+      onOpen: () => nav.push({ name: 'trueFalse' }),
+    },
   ];
 
   return (
@@ -175,10 +187,10 @@ function Hero() {
         Wirtschaftsinformatik verstehen, nicht nur auswendig lernen.
       </h1>
       <p className="text-sub text-[15.5px] sm:text-base mt-4 max-w-xl leading-relaxed">
-        Sieben interaktive Lernprogramme in einem Hub: Fachartikel mit Quiz, ein ERM-Trainer, ein
-        Zahlensysteme-Spiel, eine PAP-Quest, ein SQL-Trainer, die Vorlesungskapitel und der
-        Raster-Trainer. Ein Klick auf ein Themengebiet öffnet direkt das passende Programm — ganz
-        ohne Umweg.
+        Acht interaktive Lernprogramme in einem Hub: Fachartikel mit Quiz, ein ERM-Trainer, ein
+        Zahlensysteme-Spiel, eine PAP-Quest, ein SQL-Trainer, die Vorlesungskapitel, der
+        Raster-Trainer und ein Richtig-oder-Falsch-Trainer. Ein Klick auf ein Themengebiet öffnet
+        direkt das passende Programm — ganz ohne Umweg.
       </p>
       <div className="flex flex-wrap gap-3 mt-7">
         <a href="#module" className="btn-primary inline-block">
@@ -236,13 +248,14 @@ function StatCard({ value, label }: { value: string; label: string }) {
 
 function StatsBar() {
   return (
-    <section className="card px-4 py-2 mb-12 grid grid-cols-2 sm:grid-cols-6 divide-x divide-line">
-      <StatCard value="7" label="Programme" />
+    <section className="card px-4 py-2 mb-12 grid grid-cols-2 sm:grid-cols-7 divide-x divide-line">
+      <StatCard value="8" label="Programme" />
       <StatCard value={`${totalQuestions}+`} label="Quizfragen" />
       <StatCard value={String(sqlLevelCount)} label="SQL-Level" />
       <StatCard value={String(papLevelCount)} label="PAP-Level" />
       <StatCard value={String(numSystemCount)} label="Zahlensysteme" />
       <StatCard value={String(lectureChapterCount)} label="Vorlesungen" />
+      <StatCard value={String(trueFalseCount)} label="Behauptungen" />
     </section>
   );
 }

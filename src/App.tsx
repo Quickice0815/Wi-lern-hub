@@ -11,6 +11,7 @@ import { SqlTrainer } from './modules/sql';
 import { LectureMenu, LectureFlow } from './modules/lectures';
 import { RasterTrainer } from './modules/lectures/RasterTrainer';
 import { StrategyHub } from './modules/strategy';
+import { TrueFalseTrainer } from './modules/truefalse';
 
 function RouteOutlet({ route }: { route: Route }) {
   const nav = useNavigator();
@@ -48,6 +49,8 @@ function RouteOutlet({ route }: { route: Route }) {
       );
     case 'strategyHub':
       return <StrategyHub />;
+    case 'trueFalse':
+      return <TrueFalseTrainer />;
   }
 }
 
