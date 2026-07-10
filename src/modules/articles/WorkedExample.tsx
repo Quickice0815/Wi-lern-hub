@@ -40,11 +40,11 @@ export function WorkedExample({ exampleKey, backToArticleId }: { exampleKey: str
       <div className="flex flex-col gap-4">
         <div className="flex gap-2">
           <PhaseTab label="1 · So funktioniert's" active={phase === 'learn'} color={data.color} onClick={() => setPhase('learn')} />
-          {data.practice && (
+          {data.practiceSet && data.practiceSet.length > 0 && (
             <PhaseTab label="2 · Selbst üben" active={phase === 'practice'} color={data.color} onClick={() => setPhase('practice')} />
           )}
           <PhaseTab
-            label={data.practice ? '3 · Quizfrage' : '2 · Selbst prüfen'}
+            label={data.practiceSet ? '3 · Quizfrage' : '2 · Selbst prüfen'}
             active={phase === 'exercise'}
             color={data.color}
             onClick={() => setPhase('exercise')}
@@ -58,11 +58,11 @@ export function WorkedExample({ exampleKey, backToArticleId }: { exampleKey: str
             <LearnContent
               steps={data.steps}
               color={data.color}
-              continueLabel={data.practice ? "Verstanden — jetzt selbst üben →" : "Verstanden — jetzt selbst prüfen →"}
-              onContinue={() => setPhase(data.practice ? 'practice' : 'exercise')}
+              continueLabel={data.practiceSet ? "Verstanden — jetzt selbst üben →" : "Verstanden — jetzt selbst prüfen →"}
+              onContinue={() => setPhase(data.practiceSet ? 'practice' : 'exercise')}
             />
-          ) : phase === 'practice' && data.practice ? (
-            <ShingleLab data={data.practice} color={data.color} onDone={() => setPhase('exercise')} />
+          ) : phase === 'practice' && data.practiceSet && data.practiceSet.length > 0 ? (
+            <ShingleLab rounds={data.practiceSet} color={data.color} onDone={() => setPhase('exercise')} />
           ) : (
             <ExerciseContent
               intro={data.exercise.intro}
