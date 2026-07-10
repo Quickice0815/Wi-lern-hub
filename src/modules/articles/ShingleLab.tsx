@@ -1,14 +1,14 @@
 import { useMemo, useState } from 'react';
-import { FeedbackBox, PrimaryButton, ProgressBar } from '../../components/ui';
+import { FeedbackBox, PrimaryButton, ProgressBar, SecondaryButton } from '../../components/ui';
 import type { ShinglePracticeData } from './data';
 
 // ============================================================
-// Interaktive Rechenübung zum Shingle-Algorithmus: Der Nutzer baut
-// die Shingle-Mengen zweier Texte selbst per Klick auf, markiert
-// die Schnittmenge und tippt am Ende den Jaccard-Koeffizienten
-// selbst ein. Vier Schritte pro Runde: Text A bauen → Text B bauen
-// → Schnittmenge markieren → Jaccard berechnen — und das über
-// mehrere Runden (verschiedene Textpaare) hinweg.
+// Interaktive Rechenübung zum Shingle-Algorithmus: Der Nutzer wählt
+// aus mehreren Übungen (Textpaaren) frei aus, welche er als
+// Nächstes machen möchte — kein erzwungener linearer Ablauf. Jede
+// Übung hat vier Schritte: Text A bauen → Text B bauen →
+// Schnittmenge markieren → Jaccard berechnen. Erledigte Übungen
+// bekommen in der Übersicht einen grünen Haken.
 // ============================================================
 
 type Phase = 'buildA' | 'buildB' | 'intersect' | 'calc' | 'roundDone';
@@ -31,9 +31,8 @@ function parsePercent(raw: string): number | null {
 }
 
 export function ShingleLab({ rounds, color, onDone }: { rounds: ShinglePracticeData[]; color: string; onDone: () => void }) {
-  const [roundIndex, setRoundIndex] = useState(0);
-  const data = rounds[roundIndex];
-  const isLastRound = roundIndex === rounds.length - 1;
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [completed, setCompleted] = useState<Set<number>>(new Set());
 
   const [phase, setPhase] = useState<Phase>('buildA');
   const [filledA, setFilledA] = useState<string[]>([]);
@@ -48,7 +47,10 @@ export function ShingleLab({ rounds, color, onDone }: { rounds: ShinglePracticeD
   const [jaccardChecked, setJaccardChecked] = useState(false);
   const [jaccardCorrect, setJaccardCorrect] = useState(false);
 
+  const data = activeIndex !== null ? rounds[activeIndex] : null;
+
   const unionPool = useMemo(() => {
+    if (!data) return [];
     const seen = new Set<string>();
     const result: string[] = [];
     for (const s of [...data.shinglesA, ...data.shinglesB]) {
@@ -61,18 +63,19 @@ export function ShingleLab({ rounds, color, onDone }: { rounds: ShinglePracticeD
   }, [data]);
 
   const buildingA = phase === 'buildA';
-  const buildTarget = buildingA ? data.shinglesA : data.shinglesB;
+  const buildTarget = data ? (buildingA ? data.shinglesA : data.shinglesB) : [];
   const filled = buildingA ? filledA : filledB;
   const nextTarget = buildTarget[filled.length];
 
   const buildPool = useMemo(() => {
-    if (phase !== 'buildA' && phase !== 'buildB') return [];
+    if (!data || (phase !== 'buildA' && phase !== 'buildB')) return [];
     if (!nextTarget) return [];
     return shuffle([nextTarget, ...data.distractors]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, filled.length, data]);
 
   function attemptPlace(text: string) {
+    if (!data) return;
     if (text === nextTarget) {
       if (buildingA) {
         const next = [...filledA, text];
@@ -101,6 +104,7 @@ export function ShingleLab({ rounds, color, onDone }: { rounds: ShinglePracticeD
   }
 
   function checkShared() {
+    if (!data) return;
     const expected = new Set(data.sharedShingles);
     const ok = expected.size === selectedShared.size && [...expected].every((s) => selectedShared.has(s));
     setSharedChecked(true);
@@ -108,10 +112,14 @@ export function ShingleLab({ rounds, color, onDone }: { rounds: ShinglePracticeD
   }
 
   function checkJaccard() {
+    if (!data) return;
     const parsed = parsePercent(jaccardInput);
     const ok = parsed !== null && Math.abs(parsed - data.jaccardPercent) < 1;
     setJaccardChecked(true);
     setJaccardCorrect(ok);
+    if (ok && activeIndex !== null) {
+      setCompleted((prev) => new Set(prev).add(activeIndex));
+    }
   }
 
   function resetRoundState() {
@@ -126,24 +134,72 @@ export function ShingleLab({ rounds, color, onDone }: { rounds: ShinglePracticeD
     setJaccardCorrect(false);
   }
 
-  function goToNextRound() {
-    setRoundIndex((i) => i + 1);
+  function openRound(i: number) {
+    setActiveIndex(i);
     resetRoundState();
   }
 
-  function restartAll() {
-    setRoundIndex(0);
-    resetRoundState();
+  function backToMenu() {
+    setActiveIndex(null);
+  }
+
+  const allDone = completed.size === rounds.length;
+
+  if (activeIndex === null || !data) {
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-3">
+          <div className="flex-1">
+            <ProgressBar value={completed.size / rounds.length} color={color} />
+          </div>
+          <span className="text-sub text-[12.5px] font-semibold shrink-0">
+            {completed.size} / {rounds.length} erledigt
+          </span>
+        </div>
+        <p className="text-[13px] text-sub">Wähle eine Übung aus — in beliebiger Reihenfolge, so oft du willst.</p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          {rounds.map((r, i) => {
+            const done = completed.has(i);
+            return (
+              <button
+                key={i}
+                onClick={() => openRound(i)}
+                className="flex flex-col items-center justify-center gap-1 rounded-xl px-3 py-3.5 text-center transition-colors"
+                style={{
+                  background: done ? 'color-mix(in srgb, var(--good) 14%, var(--panel-2))' : 'var(--panel-2)',
+                  border: `1.5px solid ${done ? 'var(--good)' : 'var(--line)'}`,
+                }}
+              >
+                <span className="text-[15px] font-bold" style={{ color: done ? 'var(--good)' : 'var(--ink)' }}>
+                  {done ? '✓ ' : ''}Übung {i + 1}
+                </span>
+                <span className="text-sub text-[10.5px]">Shingle-Länge {r.n}</span>
+              </button>
+            );
+          })}
+        </div>
+        {allDone && (
+          <FeedbackBox
+            isCorrect
+            correctLabel="Alle Übungen geschafft!"
+            explanation="Du hast alle 8 Textpaare selbst durchgerechnet — genau der Ablauf, den auch eine Suchmaschine beim Duplicate-Content-Check durchläuft."
+          />
+        )}
+        <SecondaryButton onClick={onDone} className="self-start">
+          Weiter zum Quiz →
+        </SecondaryButton>
+      </div>
+    );
   }
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-3">
-        <div className="flex-1">
-          <ProgressBar value={roundIndex / rounds.length} color={color} />
-        </div>
+      <div className="flex items-center justify-between gap-3">
+        <button onClick={backToMenu} className="text-sub text-[12.5px] font-semibold hover:text-ink transition-colors">
+          ← Übungsübersicht
+        </button>
         <span className="text-sub text-[12.5px] font-semibold shrink-0">
-          Übung {roundIndex + 1} / {rounds.length}
+          Übung {activeIndex + 1} / {rounds.length}
         </span>
       </div>
 
@@ -288,26 +344,14 @@ export function ShingleLab({ rounds, color, onDone }: { rounds: ShinglePracticeD
         <>
           <FeedbackBox
             isCorrect
-            correctLabel={isLastRound ? 'Geschafft — alle Übungen fertig!' : 'Runde geschafft!'}
-            explanation={
-              isLastRound
-                ? 'Du hast alle Übungen zum Shingle-Algorithmus selbst durchgerechnet — genau der Ablauf, den auch eine Suchmaschine beim Duplicate-Content-Check durchläuft.'
-                : 'Weiter geht\'s mit dem nächsten Textpaar.'
-            }
+            correctLabel="Übung geschafft!"
+            explanation="Zurück zur Übersicht, um eine andere Übung zu machen — oder gleich weiter zum Quiz."
           />
           <div className="flex flex-wrap gap-2.5">
-            {isLastRound ? (
-              <PrimaryButton color={color} onClick={onDone}>
-                Weiter zum Quiz →
-              </PrimaryButton>
-            ) : (
-              <PrimaryButton color={color} onClick={goToNextRound}>
-                Nächste Übung →
-              </PrimaryButton>
-            )}
-            <button onClick={restartAll} className="text-sub text-[13px] font-semibold underline">
-              Von vorne
-            </button>
+            <PrimaryButton color={color} onClick={backToMenu}>
+              ← Zurück zur Übersicht
+            </PrimaryButton>
+            <SecondaryButton onClick={onDone}>Weiter zum Quiz →</SecondaryButton>
           </div>
         </>
       )}
