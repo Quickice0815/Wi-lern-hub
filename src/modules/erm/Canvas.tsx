@@ -246,18 +246,19 @@ export function ErmCanvas({
           const a = nodes.find((n) => n.id === edge.fromNodeID);
           const b = nodes.find((n) => n.id === edge.toNodeID);
           if (!a || !b) return null;
-          const isStructural =
-            (a.type === 'entity' || a.type === 'relation') && (b.type === 'entity' || b.type === 'relation');
+          // Kardinalität gehört laut Notation immer an die Entität, nie an
+          // den Beziehungstyp (Raute) — deshalb pro Seite einzeln prüfen,
+          // statt eine kombinierte Kante-ist-strukturell-Regel zu verwenden.
           const mid = { x: (a.position.x + b.position.x) / 2, y: (a.position.y + b.position.y) / 2 };
           const nearA = { x: a.position.x * 0.72 + b.position.x * 0.28, y: a.position.y * 0.72 + b.position.y * 0.28 };
           const nearB = { x: a.position.x * 0.28 + b.position.x * 0.72, y: a.position.y * 0.28 + b.position.y * 0.72 };
           return (
             <div key={edge.id}>
-              {isStructural && (
-                <>
-                  <CardinalityLabel point={nearA} value={edge.cardFrom} onClick={() => cycleCard(edge.id, 'cardFrom')} />
-                  <CardinalityLabel point={nearB} value={edge.cardTo} onClick={() => cycleCard(edge.id, 'cardTo')} />
-                </>
+              {a.type === 'entity' && (
+                <CardinalityLabel point={nearA} value={edge.cardFrom} onClick={() => cycleCard(edge.id, 'cardFrom')} />
+              )}
+              {b.type === 'entity' && (
+                <CardinalityLabel point={nearB} value={edge.cardTo} onClick={() => cycleCard(edge.id, 'cardTo')} />
               )}
               <button
                 onClick={() => removeEdge(edge.id)}

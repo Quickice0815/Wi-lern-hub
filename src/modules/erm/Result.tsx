@@ -80,7 +80,10 @@ export function ErmResult({
       return { ok: false, text: `${r.name}: ${r.card}`, note: 'Beziehung fehlt' };
     }
     const relEdges = edges.filter((e) => e.fromNodeID === relNode.id || e.toNodeID === relNode.id);
-    const cardsOnRel = relEdges.map((e) => (e.fromNodeID === relNode.id ? e.cardFrom : e.cardTo));
+    // Die Kardinalität steht an der Entität, nicht am Beziehungstyp: Ist
+    // relNode die "from"-Seite der Kante, liegt die Entität auf "to" (und
+    // umgekehrt) — deshalb hier die jeweils GEGENÜBERLIEGENDE Seite lesen.
+    const cardsOnRel = relEdges.map((e) => (e.fromNodeID === relNode.id ? e.cardTo : e.cardFrom));
     const expected = r.card.split(':');
     const ok = relEdges.length >= 2 && normCard(cardsOnRel.slice(0, 2)) === normCard(expected);
     return {
