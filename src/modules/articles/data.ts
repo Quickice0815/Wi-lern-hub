@@ -1325,7 +1325,7 @@ export interface WorkedExampleDataT {
   color: string;
   steps: WorkedStep[];
   exercise: WorkedExercise;
-  practice?: ShinglePracticeData;
+  practiceSet?: ShinglePracticeData[];
 }
 
 export const WorkedExamples: Record<string, WorkedExampleDataT> = {
@@ -1370,16 +1370,88 @@ export const WorkedExamples: Record<string, WorkedExampleDataT> = {
       explain:
         'Ü = 8 / 20 = 0,40 = 40 %. Zähler = Schnittmenge (gemeinsame Shingles), Nenner = Vereinigungsmenge (alle unterschiedlichen Shingles).',
     },
-    practice: {
-      n: 2,
-      textA: 'guter service schneller versand',
-      textB: 'schneller versand freundlicher support',
-      shinglesA: ['guter service', 'service schneller', 'schneller versand'],
-      shinglesB: ['schneller versand', 'versand freundlicher', 'freundlicher support'],
-      distractors: ['guter schneller', 'service versand', 'versand support', 'freundlicher versand', 'guter versand'],
-      sharedShingles: ['schneller versand'],
-      jaccardPercent: 20,
-    },
+    practiceSet: [
+      {
+        n: 2,
+        textA: 'guter service schneller versand',
+        textB: 'schneller versand freundlicher support',
+        shinglesA: ['guter service', 'service schneller', 'schneller versand'],
+        shinglesB: ['schneller versand', 'versand freundlicher', 'freundlicher support'],
+        distractors: ['guter schneller', 'service versand', 'versand support', 'freundlicher versand', 'guter versand'],
+        sharedShingles: ['schneller versand'],
+        jaccardPercent: 20,
+      },
+      {
+        n: 2,
+        textA: 'roter apfel schmeckt süß',
+        textB: 'blaue blume riecht gut',
+        shinglesA: ['roter apfel', 'apfel schmeckt', 'schmeckt süß'],
+        shinglesB: ['blaue blume', 'blume riecht', 'riecht gut'],
+        distractors: ['apfel blume', 'roter riecht', 'schmeckt blume', 'süß gut', 'blaue apfel'],
+        sharedShingles: [],
+        jaccardPercent: 0,
+      },
+      {
+        n: 2,
+        textA: 'kunde bestellt artikel online',
+        textB: 'kunde bestellt artikel schnell',
+        shinglesA: ['kunde bestellt', 'bestellt artikel', 'artikel online'],
+        shinglesB: ['kunde bestellt', 'bestellt artikel', 'artikel schnell'],
+        distractors: ['bestellt online', 'artikel kunde', 'kunde schnell', 'online schnell'],
+        sharedShingles: ['kunde bestellt', 'bestellt artikel'],
+        jaccardPercent: 50,
+      },
+      {
+        n: 3,
+        textA: 'der kunde kauft günstig ein',
+        textB: 'der kunde kauft schnell online',
+        shinglesA: ['der kunde kauft', 'kunde kauft günstig', 'kauft günstig ein'],
+        shinglesB: ['der kunde kauft', 'kunde kauft schnell', 'kauft schnell online'],
+        distractors: ['kunde kauft ein', 'der kauft günstig', 'kauft der kunde', 'günstig kunde kauft'],
+        sharedShingles: ['der kunde kauft'],
+        jaccardPercent: 20,
+      },
+      {
+        n: 3,
+        textA: 'wir liefern schnell und günstig',
+        textB: 'wir liefern schnell und zuverlässig',
+        shinglesA: ['wir liefern schnell', 'liefern schnell und', 'schnell und günstig'],
+        shinglesB: ['wir liefern schnell', 'liefern schnell und', 'schnell und zuverlässig'],
+        distractors: ['und schnell liefern', 'liefern wir schnell', 'schnell günstig und', 'wir und liefern'],
+        sharedShingles: ['wir liefern schnell', 'liefern schnell und'],
+        jaccardPercent: 50,
+      },
+      {
+        n: 2,
+        textA: 'montag dienstag mittwoch donnerstag freitag',
+        textB: 'dienstag mittwoch donnerstag freitag samstag',
+        shinglesA: ['montag dienstag', 'dienstag mittwoch', 'mittwoch donnerstag', 'donnerstag freitag'],
+        shinglesB: ['dienstag mittwoch', 'mittwoch donnerstag', 'donnerstag freitag', 'freitag samstag'],
+        distractors: ['montag mittwoch', 'dienstag freitag', 'mittwoch samstag', 'montag samstag', 'freitag montag'],
+        sharedShingles: ['dienstag mittwoch', 'mittwoch donnerstag', 'donnerstag freitag'],
+        jaccardPercent: 60,
+      },
+      {
+        n: 3,
+        textA: 'der neue laptop hat viel speicher',
+        textB: 'der neue laptop hat wenig speicher',
+        shinglesA: ['der neue laptop', 'neue laptop hat', 'laptop hat viel', 'hat viel speicher'],
+        shinglesB: ['der neue laptop', 'neue laptop hat', 'laptop hat wenig', 'hat wenig speicher'],
+        distractors: ['neue laptop viel', 'laptop hat speicher', 'der laptop hat', 'hat neue laptop'],
+        sharedShingles: ['der neue laptop', 'neue laptop hat'],
+        jaccardPercent: 33,
+      },
+      {
+        n: 2,
+        textA: 'guten morgen liebe leute',
+        textB: 'guten morgen liebe leute',
+        shinglesA: ['guten morgen', 'morgen liebe', 'liebe leute'],
+        shinglesB: ['guten morgen', 'morgen liebe', 'liebe leute'],
+        distractors: ['guten liebe', 'morgen leute', 'liebe guten', 'leute morgen'],
+        sharedShingles: ['guten morgen', 'morgen liebe', 'liebe leute'],
+        jaccardPercent: 100,
+      },
+    ],
   },
   skalen: {
     title: 'Anwendung: Skalenniveau & erlaubte Verdichtung bestimmen',

@@ -1,16 +1,17 @@
 import { useMemo, useState } from 'react';
-import { FeedbackBox, PrimaryButton } from '../../components/ui';
+import { FeedbackBox, PrimaryButton, ProgressBar } from '../../components/ui';
 import type { ShinglePracticeData } from './data';
 
 // ============================================================
 // Interaktive Rechenübung zum Shingle-Algorithmus: Der Nutzer baut
 // die Shingle-Mengen zweier Texte selbst per Klick auf, markiert
 // die Schnittmenge und tippt am Ende den Jaccard-Koeffizienten
-// selbst ein. Vier Phasen: Text A bauen → Text B bauen →
-// Schnittmenge markieren → Jaccard berechnen.
+// selbst ein. Vier Schritte pro Runde: Text A bauen → Text B bauen
+// → Schnittmenge markieren → Jaccard berechnen — und das über
+// mehrere Runden (verschiedene Textpaare) hinweg.
 // ============================================================
 
-type Phase = 'buildA' | 'buildB' | 'intersect' | 'calc' | 'done';
+type Phase = 'buildA' | 'buildB' | 'intersect' | 'calc' | 'roundDone';
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -29,7 +30,11 @@ function parsePercent(raw: string): number | null {
   return n <= 1 ? n * 100 : n;
 }
 
-export function ShingleLab({ data, color, onDone }: { data: ShinglePracticeData; color: string; onDone: () => void }) {
+export function ShingleLab({ rounds, color, onDone }: { rounds: ShinglePracticeData[]; color: string; onDone: () => void }) {
+  const [roundIndex, setRoundIndex] = useState(0);
+  const data = rounds[roundIndex];
+  const isLastRound = roundIndex === rounds.length - 1;
+
   const [phase, setPhase] = useState<Phase>('buildA');
   const [filledA, setFilledA] = useState<string[]>([]);
   const [filledB, setFilledB] = useState<string[]>([]);
@@ -109,7 +114,7 @@ export function ShingleLab({ data, color, onDone }: { data: ShinglePracticeData;
     setJaccardCorrect(ok);
   }
 
-  function reset() {
+  function resetRoundState() {
     setPhase('buildA');
     setFilledA([]);
     setFilledB([]);
@@ -121,8 +126,27 @@ export function ShingleLab({ data, color, onDone }: { data: ShinglePracticeData;
     setJaccardCorrect(false);
   }
 
+  function goToNextRound() {
+    setRoundIndex((i) => i + 1);
+    resetRoundState();
+  }
+
+  function restartAll() {
+    setRoundIndex(0);
+    resetRoundState();
+  }
+
   return (
     <div className="flex flex-col gap-4">
+      <div className="flex items-center gap-3">
+        <div className="flex-1">
+          <ProgressBar value={roundIndex / rounds.length} color={color} />
+        </div>
+        <span className="text-sub text-[12.5px] font-semibold shrink-0">
+          Übung {roundIndex + 1} / {rounds.length}
+        </span>
+      </div>
+
       <p className="text-[13px] text-sub">
         Text A: <span className="text-ink font-semibold">„{data.textA}“</span>
         <br />
@@ -189,6 +213,7 @@ export function ShingleLab({ data, color, onDone }: { data: ShinglePracticeData;
                 </button>
               );
             })}
+            {unionPool.length === 0 && <span className="text-sub text-[12.5px]">— (keine Shingles, ungewöhnlicher Fall) —</span>}
           </div>
           <p className="text-sub text-[11.5px]">{unionPool.length} verschiedene Shingles insgesamt = Vereinigungsmenge.</p>
           {!sharedCorrect && (
@@ -252,26 +277,36 @@ export function ShingleLab({ data, color, onDone }: { data: ShinglePracticeData;
             />
           )}
           {jaccardChecked && jaccardCorrect && (
-            <PrimaryButton color={color} onClick={() => setPhase('done')} className="self-start">
+            <PrimaryButton color={color} onClick={() => setPhase('roundDone')} className="self-start">
               Fertig →
             </PrimaryButton>
           )}
         </>
       )}
 
-      {phase === 'done' && (
+      {phase === 'roundDone' && (
         <>
           <FeedbackBox
             isCorrect
-            correctLabel="Geschafft!"
-            explanation="Du hast die Shingle-Mengen selbst gebaut, die Schnittmenge markiert und den Jaccard-Koeffizienten berechnet — genau der Ablauf, den auch eine Suchmaschine beim Duplicate-Content-Check durchläuft."
+            correctLabel={isLastRound ? 'Geschafft — alle Übungen fertig!' : 'Runde geschafft!'}
+            explanation={
+              isLastRound
+                ? 'Du hast alle Übungen zum Shingle-Algorithmus selbst durchgerechnet — genau der Ablauf, den auch eine Suchmaschine beim Duplicate-Content-Check durchläuft.'
+                : 'Weiter geht\'s mit dem nächsten Textpaar.'
+            }
           />
-          <div className="flex gap-2.5">
-            <PrimaryButton color={color} onClick={onDone}>
-              Weiter zum Quiz →
-            </PrimaryButton>
-            <button onClick={reset} className="text-sub text-[13px] font-semibold underline">
-              Nochmal üben
+          <div className="flex flex-wrap gap-2.5">
+            {isLastRound ? (
+              <PrimaryButton color={color} onClick={onDone}>
+                Weiter zum Quiz →
+              </PrimaryButton>
+            ) : (
+              <PrimaryButton color={color} onClick={goToNextRound}>
+                Nächste Übung →
+              </PrimaryButton>
+            )}
+            <button onClick={restartAll} className="text-sub text-[13px] font-semibold underline">
+              Von vorne
             </button>
           </div>
         </>
