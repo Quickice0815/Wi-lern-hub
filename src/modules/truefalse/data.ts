@@ -49,10 +49,10 @@ export const STATEMENTS: TrueFalseStatement[] = [
   },
   {
     id: 4,
-    text: 'Bei dem Term www.hs-coburg.de handelt es sich um eine URL-Adresse.',
+    text: 'Bei dem Term www.beispiel-hochschule.de handelt es sich um eine URL-Adresse.',
     correct: true,
     explain:
-      'www.hs-coburg.de identifiziert die Adresse eines Webservers im Internet und wird im Sprachgebrauch der Vorlesung als URL-Adresse (Domain/Adresse einer Ressource) bezeichnet.',
+      'www.beispiel-hochschule.de identifiziert die Adresse eines Webservers im Internet und wird im Sprachgebrauch der Vorlesung als URL-Adresse (Domain/Adresse einer Ressource) bezeichnet.',
   },
   {
     id: 5,

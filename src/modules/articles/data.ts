@@ -900,7 +900,7 @@ export const Articles: Article[] = [
         q: 'Wer entwickelte die Chernoff Faces, wann und wo?',
         options: [
           'Herman Chernoff, 1973, Professor für Angewandte Mathematik in Harvard',
-          'Eduard Gerhardt, 2016, Hochschule Coburg',
+          'John Tukey, 1977, Princeton University',
           'Ein anonymes Google-Forscherteam, 2005',
           'Herman Chernoff, 1995, MIT',
         ],
