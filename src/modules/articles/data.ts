@@ -1307,11 +1307,25 @@ export interface WorkedExercise {
   explain: string;
 }
 
+// Interaktive Rechenübung: Nutzer baut die Shingle-Mengen selbst aus zwei
+// Texten, markiert die Schnittmenge und berechnet den Jaccard-Koeffizienten.
+export interface ShinglePracticeData {
+  n: number;
+  textA: string;
+  textB: string;
+  shinglesA: string[];
+  shinglesB: string[];
+  distractors: string[];
+  sharedShingles: string[];
+  jaccardPercent: number;
+}
+
 export interface WorkedExampleDataT {
   title: string;
   color: string;
   steps: WorkedStep[];
   exercise: WorkedExercise;
+  practice?: ShinglePracticeData;
 }
 
 export const WorkedExamples: Record<string, WorkedExampleDataT> = {
@@ -1355,6 +1369,16 @@ export const WorkedExamples: Record<string, WorkedExampleDataT> = {
       correct: 1,
       explain:
         'Ü = 8 / 20 = 0,40 = 40 %. Zähler = Schnittmenge (gemeinsame Shingles), Nenner = Vereinigungsmenge (alle unterschiedlichen Shingles).',
+    },
+    practice: {
+      n: 2,
+      textA: 'guter service schneller versand',
+      textB: 'schneller versand freundlicher support',
+      shinglesA: ['guter service', 'service schneller', 'schneller versand'],
+      shinglesB: ['schneller versand', 'versand freundlicher', 'freundlicher support'],
+      distractors: ['guter schneller', 'service versand', 'versand support', 'freundlicher versand', 'guter versand'],
+      sharedShingles: ['schneller versand'],
+      jaccardPercent: 20,
     },
   },
   skalen: {

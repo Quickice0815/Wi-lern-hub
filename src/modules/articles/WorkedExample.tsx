@@ -4,8 +4,9 @@ import { useCloudProgress } from '../../lib/progress';
 import { BackBar, Card, FeedbackBox, OptionButton, PageShell, PrimaryButton, SecondaryButton } from '../../components/ui';
 import { WorkedExamples } from './data';
 import type { ArticlesProgress } from './progressTypes';
+import { ShingleLab } from './ShingleLab';
 
-type Phase = 'learn' | 'exercise';
+type Phase = 'learn' | 'practice' | 'exercise';
 
 // Pendant zu WorkedExampleView.swift — zwei Phasen: erst die
 // Schritt-für-Schritt-Erklärung ("So funktioniert's"), dann eine
@@ -39,7 +40,15 @@ export function WorkedExample({ exampleKey, backToArticleId }: { exampleKey: str
       <div className="flex flex-col gap-4">
         <div className="flex gap-2">
           <PhaseTab label="1 · So funktioniert's" active={phase === 'learn'} color={data.color} onClick={() => setPhase('learn')} />
-          <PhaseTab label="2 · Selbst prüfen" active={phase === 'exercise'} color={data.color} onClick={() => setPhase('exercise')} />
+          {data.practice && (
+            <PhaseTab label="2 · Selbst üben" active={phase === 'practice'} color={data.color} onClick={() => setPhase('practice')} />
+          )}
+          <PhaseTab
+            label={data.practice ? '3 · Quizfrage' : '2 · Selbst prüfen'}
+            active={phase === 'exercise'}
+            color={data.color}
+            onClick={() => setPhase('exercise')}
+          />
         </div>
 
         <Card className="p-[22px] flex flex-col gap-4">
@@ -49,8 +58,11 @@ export function WorkedExample({ exampleKey, backToArticleId }: { exampleKey: str
             <LearnContent
               steps={data.steps}
               color={data.color}
-              onContinue={() => setPhase('exercise')}
+              continueLabel={data.practice ? "Verstanden — jetzt selbst üben →" : "Verstanden — jetzt selbst prüfen →"}
+              onContinue={() => setPhase(data.practice ? 'practice' : 'exercise')}
             />
+          ) : phase === 'practice' && data.practice ? (
+            <ShingleLab data={data.practice} color={data.color} onDone={() => setPhase('exercise')} />
           ) : (
             <ExerciseContent
               intro={data.exercise.intro}
@@ -112,10 +124,12 @@ function PhaseTab({ label, active, color, onClick }: { label: string; active: bo
 function LearnContent({
   steps,
   color,
+  continueLabel,
   onContinue,
 }: {
   steps: { h: string; t: string }[];
   color: string;
+  continueLabel: string;
   onContinue: () => void;
 }) {
   return (
@@ -135,7 +149,7 @@ function LearnContent({
         </div>
       ))}
       <PrimaryButton color={color} onClick={onContinue} className="mt-1.5 self-start">
-        Verstanden — jetzt selbst prüfen →
+        {continueLabel}
       </PrimaryButton>
     </div>
   );
