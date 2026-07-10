@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigator } from '../../lib/navigation';
 import { useCloudProgress } from '../../lib/progress';
 import { BackBar, Card, FeedbackBox, PageShell, PrimaryButton, ProgressBar, SecondaryButton } from '../../components/ui';
@@ -29,6 +29,16 @@ function shuffled<T>(arr: T[]): T[] {
   return copy;
 }
 
+interface ReasonOption {
+  text: string;
+  correct: boolean;
+}
+
+// reasons[0] ist per Konvention (siehe data.ts) immer die richtige Begründung.
+function shuffledReasons(reasons: string[]): ReasonOption[] {
+  return shuffled(reasons.map((text, i) => ({ text, correct: i === 0 })));
+}
+
 type Phase = 'intro' | 'quiz' | 'done';
 
 interface TrueFalseProgress {
@@ -42,6 +52,7 @@ export function TrueFalseTrainer() {
   const [order, setOrder] = useState<TrueFalseStatement[]>(() => shuffled(STATEMENTS));
   const [index, setIndex] = useState(0);
   const [picked, setPicked] = useState<boolean | null>(null);
+  const [reasonPicked, setReasonPicked] = useState<number | null>(null);
   const [answers, setAnswers] = useState<AnswerRecord[]>([]);
   const [, setProgress] = useCloudProgress<TrueFalseProgress>('truefalse', {});
 
@@ -49,6 +60,7 @@ export function TrueFalseTrainer() {
     setOrder(shuffled(STATEMENTS));
     setIndex(0);
     setPicked(null);
+    setReasonPicked(null);
     setAnswers([]);
     setPhase('quiz');
   }
@@ -64,6 +76,7 @@ export function TrueFalseTrainer() {
     if (index + 1 < order.length) {
       setIndex((i) => i + 1);
       setPicked(null);
+      setReasonPicked(null);
     } else {
       const finalScore = answers.filter((a) => a.isCorrect).length;
       setProgress((prev) => ({
@@ -77,6 +90,14 @@ export function TrueFalseTrainer() {
   const statement = order[index];
   const answered = picked !== null;
   const isCorrect = answered && picked === statement.correct;
+  // Nur wenn die Aussage falsch ist UND der Nutzer korrekt "Nein" geklickt hat,
+  // fragt die App zusätzlich nach der Begründung.
+  const showReasonPicker = answered && picked === false && !statement.correct && !!statement.reasons;
+  const reasonOptions = useMemo(
+    () => (statement.reasons ? shuffledReasons(statement.reasons) : null),
+    [statement.reasons],
+  );
+  const readyForNext = answered && (!showReasonPicker || reasonPicked !== null);
 
   return (
     <PageShell>
@@ -109,7 +130,15 @@ export function TrueFalseTrainer() {
               <JaNeinButton label="✗ Nein" value={false} picked={picked} answered={answered} correct={statement.correct} onClick={() => choose(false)} />
             </div>
 
-            {answered && (
+            {answered && showReasonPicker && reasonOptions && (
+              <ReasonPicker
+                options={reasonOptions}
+                picked={reasonPicked}
+                onPick={setReasonPicked}
+              />
+            )}
+
+            {answered && !showReasonPicker && (
               <FeedbackBox
                 isCorrect={isCorrect}
                 correctLabel="Richtig erkannt!"
@@ -119,7 +148,7 @@ export function TrueFalseTrainer() {
             )}
           </Card>
 
-          {answered && (
+          {readyForNext && (
             <div className="flex justify-end">
               <PrimaryButton color={COLOR} onClick={goNext}>
                 {index + 1 < order.length ? 'Nächste Behauptung →' : 'Ergebnis anzeigen →'}
@@ -151,8 +180,9 @@ function Intro({ onStart }: { onStart: () => void }) {
         <p className="text-sub text-[14px] leading-relaxed">
           Du bekommst 47 Behauptungen aus der gesamten Vorlesung — von Zahlensystemen über Netzwerke und
           Datenbanken bis zu SAP-Buchungen. Klicke einfach <b className="text-ink">Ja</b> oder{' '}
-          <b className="text-ink">Nein</b>. Egal ob richtig oder falsch: Direkt danach zeigt dir die App die
-          Begründung, warum die Aussage stimmt oder nicht.
+          <b className="text-ink">Nein</b>. Liegst du bei „Nein" richtig, fragt dich die App zusätzlich,
+          welche von drei Begründungen zutrifft. In jedem Fall zeigt sie dir direkt danach, warum die
+          Aussage stimmt oder nicht.
         </p>
         <p className="text-sub text-[14px] leading-relaxed">
           Bei jedem Durchlauf werden die Behauptungen neu gemischt.
@@ -202,6 +232,53 @@ function JaNeinButton({
     >
       {label}
     </button>
+  );
+}
+
+function ReasonPicker({
+  options,
+  picked,
+  onPick,
+}: {
+  options: ReasonOption[];
+  picked: number | null;
+  onPick: (index: number) => void;
+}) {
+  const answered = picked !== null;
+  return (
+    <div className="flex flex-col gap-2.5">
+      <span className="text-[13px] font-bold" style={{ color: 'var(--warn)' }}>
+        Richtig erkannt — Nein! Aber warum?
+      </span>
+      <p className="text-sub text-[13px]">Wähle die richtige Begründung aus:</p>
+      <div className="flex flex-col gap-2">
+        {options.map((opt, i) => {
+          const isPicked = picked === i;
+          const showCorrect = answered && opt.correct;
+          const showWrong = answered && isPicked && !opt.correct;
+          return (
+            <button
+              key={i}
+              onClick={() => !answered && onPick(i)}
+              disabled={answered}
+              className="text-left rounded-[10px] p-3 text-[13.5px] leading-snug transition-colors disabled:cursor-default"
+              style={{
+                backgroundColor: showCorrect
+                  ? 'color-mix(in srgb, var(--good) 15%, transparent)'
+                  : showWrong
+                    ? 'color-mix(in srgb, var(--bad) 15%, transparent)'
+                    : 'var(--panel-2)',
+                border: `1.5px solid ${showCorrect ? 'var(--good)' : showWrong ? 'var(--bad)' : 'transparent'}`,
+                color: 'var(--ink)',
+              }}
+            >
+              {showCorrect ? '✓ ' : showWrong ? '× ' : ''}
+              {opt.text}
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 

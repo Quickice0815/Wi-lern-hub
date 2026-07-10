@@ -3,6 +3,10 @@ export interface TrueFalseStatement {
   text: string;
   correct: boolean;
   explain: string;
+  // Nur bei correct === false gesetzt: 3 mögliche Begründungen, wieso die
+  // Aussage falsch ist. Index 0 ist immer die richtige Begründung — die
+  // Anzeige-Reihenfolge wird zur Laufzeit gemischt.
+  reasons?: string[];
 }
 
 // ============================================================
@@ -25,6 +29,11 @@ export const STATEMENTS: TrueFalseStatement[] = [
     correct: false,
     explain:
       'Kompiliert wird der Quellcode/Programmcode (ein Algorithmus, formuliert in einer konkreten Programmiersprache), nicht der Algorithmus selbst. Der Algorithmus ist die abstrakte, sprachunabhängige Beschreibung der Lösung — er muss erst als Quellcode implementiert werden, bevor er kompiliert werden kann.',
+    reasons: [
+      'Kompiliert wird der Quellcode/Programmcode, nicht der abstrakte Algorithmus selbst.',
+      'Kompilation wandelt Maschinencode in Quellcode um, nicht umgekehrt.',
+      'Ein Algorithmus kann grundsätzlich nicht in eine Programmiersprache übersetzt werden.',
+    ],
   },
   {
     id: 3,
@@ -32,6 +41,11 @@ export const STATEMENTS: TrueFalseStatement[] = [
     correct: false,
     explain:
       'Eine feste, täglich wiederkehrende Übermittlung nach Geschäftsschluss ist eine periodische (geplante) Übertragung, kein On-Demand-Abruf. On-Demand bedeutet, dass die Daten gezielt auf Anfrage abgerufen werden — nicht automatisch nach einem festen Zeitplan.',
+    reasons: [
+      'Eine feste, täglich wiederkehrende Übermittlung ist periodisch/batch-artig, kein Abruf auf Anfrage (On-Demand).',
+      'On-Demand bezeichnet nur Kommunikation zwischen Kunden und Unternehmen, nicht zwischen Servern.',
+      'Die Übermittlung von Umsatzdaten zählt technisch nicht als Kommunikation zwischen Servern.',
+    ],
   },
   {
     id: 4,
@@ -46,6 +60,11 @@ export const STATEMENTS: TrueFalseStatement[] = [
     correct: false,
     explain:
       'LoC zählt die Zeilen im Quellcode/Programmcode (dem für Menschen lesbaren, in einer Programmiersprache geschriebenen Code) — nicht im binären Maschinencode, den ein Compiler daraus erzeugt.',
+    reasons: [
+      'LoC zählt Zeilen im Quellcode/Programmcode, nicht im binären Maschinencode.',
+      'LoC beschreibt die Anzahl der Funktionen, nicht der Zeilen.',
+      'LoC ist nur für Algorithmen definiert, nicht für fertigen Code.',
+    ],
   },
   {
     id: 6,
@@ -60,6 +79,11 @@ export const STATEMENTS: TrueFalseStatement[] = [
     correct: false,
     explain:
       'FF₁₆ = 15·16 + 15 = 255₁₀, nicht 4.095. Die Dezimalzahl 4.095 entspräche FFF₁₆ (15·256 + 15·16 + 15).',
+    reasons: [
+      'FF₁₆ = 15·16 + 15 = 255₁₀, nicht 4.095.',
+      'FF ist keine gültige Hexadezimalzahl.',
+      'FF₁₆ entspricht der Dezimalzahl 15.',
+    ],
   },
   {
     id: 8,
@@ -67,6 +91,11 @@ export const STATEMENTS: TrueFalseStatement[] = [
     correct: false,
     explain:
       'Als allgemeine, unqualifizierte Aussage stimmt das nicht für jedes Bild: Bei Vektorgrafiken bestimmt die Farbtiefe den Speicherbedarf gar nicht erst, da sie mathematisch (nicht pixelweise) beschrieben werden. Nur bei Pixelgrafiken hängt der unkomprimierte Speicherbedarf von Auflösung × Farbtiefe ab.',
+    reasons: [
+      'Die Aussage gilt nicht allgemein: Vektorgrafiken haben gar keine Farbtiefe pro Pixel, wodurch die Regel dort nicht greift.',
+      'Bei größerer Farbtiefe sinkt der Speicherbedarf durch effizientere Kompression.',
+      'Farbtiefe hat grundsätzlich keinen Einfluss auf den Speicherbedarf eines Bildes.',
+    ],
   },
   {
     id: 9,
@@ -81,6 +110,11 @@ export const STATEMENTS: TrueFalseStatement[] = [
     correct: false,
     explain:
       'Offene Posten sind einzelne, noch nicht ausgeglichene Buchungen (Ereignisse) — das sind Bewegungsdaten. Bestandsdaten wären dagegen ein aggregierter Zustand zu einem Zeitpunkt, z. B. der Saldo/Kontostand am Ende des Tages.',
+    reasons: [
+      'Offene Posten sind einzelne, noch nicht ausgeglichene Buchungen (Ereignisse) — das sind Bewegungsdaten, nicht Bestandsdaten.',
+      '5.000 Euro ist ein zu kleiner Betrag, um als Bestandsdaten zu gelten.',
+      'Kreditorenkonten können grundsätzlich keine Bestandsdaten enthalten.',
+    ],
   },
   {
     id: 11,
@@ -88,6 +122,11 @@ export const STATEMENTS: TrueFalseStatement[] = [
     correct: false,
     explain:
       'Nach der Von-Neumann-Architektur kann die CPU nur Programme ausführen, die im Hauptspeicher (RAM) liegen. Code auf der Festplatte muss erst in den Hauptspeicher geladen werden, bevor der Prozessor ihn ausführen kann — der Ort spielt also sehr wohl eine Rolle.',
+    reasons: [
+      'Nach der Von-Neumann-Architektur kann die CPU nur Code ausführen, der im Hauptspeicher liegt — Code auf der Festplatte muss erst geladen werden.',
+      'Die CPU kann Code sowohl im Hauptspeicher als auch direkt auf der Festplatte ausführen, auf der Festplatte nur langsamer.',
+      'Nur Code auf der Festplatte kann von der CPU ausgeführt werden, nicht im Hauptspeicher.',
+    ],
   },
   {
     id: 12,
@@ -95,6 +134,11 @@ export const STATEMENTS: TrueFalseStatement[] = [
     correct: false,
     explain:
       'Das ERM ist die graphische Beschreibungssprache des semantischen Datenmodells (Objekte, Beziehungen, Attribute) — nicht des logischen Datenbankmodells, das zusätzlich Feldformate und Primärschlüssel im Kontext eines konkreten Datenbankmodells (z. B. dem relationalen Modell) festlegt.',
+    reasons: [
+      'Das ERM gehört zum semantischen Datenmodell, nicht zum logischen Datenbankmodell (das zusätzlich Feldformate/Primärschlüssel festlegt).',
+      'ERM-Diagramme beschreiben ausschließlich das physische Datenbankmodell eines konkreten DBMS.',
+      'Es gibt in der Datenmodellierung keine Unterscheidung zwischen semantischem und logischem Modell.',
+    ],
   },
   {
     id: 13,
@@ -116,6 +160,11 @@ export const STATEMENTS: TrueFalseStatement[] = [
     correct: false,
     explain:
       'Moore’s Law beschreibt die Verdopplung der Schaltkreisdichte pro Fläche alle zwei Jahre. Das setzt physikalisch voraus, dass Transistoren immer weiter verkleinert werden können — erreichen sie Atomgröße, ist diese physikalische Grenze erreicht, und das Gesetz verliert seine Gültigkeit.',
+    reasons: [
+      'Moore’s Law setzt voraus, dass Transistoren immer weiter verkleinert werden können — bei Atomgröße ist diese physikalische Grenze erreicht, das Gesetz verliert also seine Gültigkeit.',
+      'Moore’s Law bezieht sich nicht auf Transistorgröße, sondern nur auf Softwarequalität.',
+      'Moore’s Law gilt für Transistoren unabhängig von ihrer physischen Größe, da es sich um ein rein mathematisches Modell handelt.',
+    ],
   },
   {
     id: 16,
@@ -137,6 +186,11 @@ export const STATEMENTS: TrueFalseStatement[] = [
     correct: false,
     explain:
       'Der Gartner Hype Cycle bewertet den Nutzen bzw. Reifegrad einer Technologie über die Zeit — nicht die Anbieter/Dienstleister dahinter. Die Bewertung von Anbietern übernimmt stattdessen der Gartner Magic Quadrant.',
+    reasons: [
+      'Der Hype Cycle bewertet die Reife/den Nutzen einer Technologie über die Zeit — die Bewertung von Anbietern übernimmt der Gartner Magic Quadrant.',
+      'Der Gartner Hype Cycle bewertet ausschließlich die Kosten neuer Technologien.',
+      'Gartner-Methoden werden grundsätzlich nicht zur Anbieteranalyse eingesetzt.',
+    ],
   },
   {
     id: 19,
@@ -165,6 +219,11 @@ export const STATEMENTS: TrueFalseStatement[] = [
     correct: false,
     explain:
       'Die Kompilation läuft in die entgegengesetzte Richtung: Quellcode wird in Maschinencode übersetzt. Die Rückrichtung (Maschinencode → Quellcode) wäre eine Dekompilation.',
+    reasons: [
+      'Die Kompilation läuft andersherum: Quellcode wird in Maschinencode übersetzt (die Rückrichtung wäre eine Dekompilation).',
+      'Kompilation wandelt den Algorithmus direkt in Quellcode um.',
+      'Kompilation und Dekompilation sind technisch dasselbe, nur mit unterschiedlichem Namen.',
+    ],
   },
   {
     id: 23,
@@ -179,6 +238,11 @@ export const STATEMENTS: TrueFalseStatement[] = [
     correct: false,
     explain:
       'Adaptionsarten (wie Customizing = Adaptionsart 2) beschreiben, wie man vorgefertigte Standardsoftware an den eigenen Bedarf anpasst. Individualsoftware wird dagegen von Grund auf maßgeschneidert entwickelt — der Begriff „Adaptionsart" passt hier gar nicht, unabhängig vom Betriebsmodell.',
+    reasons: [
+      'Adaptionsarten passen vorgefertigte Standardsoftware an — Individualsoftware wird komplett neu entwickelt, der Begriff passt hier nicht, unabhängig vom Betriebsmodell.',
+      'Adaptionsart 2 (Customizing) ist ausschließlich mit On-Premise kombinierbar, nie mit On-Demand.',
+      'Individualsoftware kann grundsätzlich nicht im On-Demand-Modell betrieben werden.',
+    ],
   },
   {
     id: 25,
@@ -193,6 +257,11 @@ export const STATEMENTS: TrueFalseStatement[] = [
     correct: false,
     explain:
       'Gilder’s Law bezieht sich auf die Übertragungskapazität (Anzahl übertragener Bits pro Sekunde), nicht auf die Übertragungsgeschwindigkeit (physikalische Ausbreitung des Signals). Diese beiden Größen sind in der Vorlesung explizit unterschieden.',
+    reasons: [
+      'Gilder’s Law bezieht sich auf die Übertragungskapazität (Bits pro Sekunde), nicht auf die Übertragungsgeschwindigkeit (Signalausbreitung).',
+      'Gilder’s Law beschreibt eine Verdopplung alle 24 Monate, nicht alle 9 Monate.',
+      'Gilder’s Law gilt nur für kabelgebundene, nicht für kabellose Netzwerke.',
+    ],
   },
   {
     id: 27,
@@ -214,6 +283,11 @@ export const STATEMENTS: TrueFalseStatement[] = [
     correct: false,
     explain:
       'Die Abkürzung stimmt, die Beschreibung aber nicht: Die reine Vermietung von Hardware-Komponenten ist Infrastructure as a Service (IaaS). PaaS stellt zusätzlich eine komplette Entwicklungs-/Laufzeitplattform (Betriebssystem, Middleware) bereit.',
+    reasons: [
+      'Die reine Vermietung von Hardware ist Infrastructure as a Service (IaaS); PaaS liefert zusätzlich eine komplette Entwicklungs-/Laufzeitplattform.',
+      'PaaS steht für „Payment as a Service" und hat nichts mit Hosting zu tun.',
+      'PaaS beschreibt die Vermietung fertiger Anwendungssoftware, nicht von Infrastruktur.',
+    ],
   },
   {
     id: 30,
@@ -228,6 +302,11 @@ export const STATEMENTS: TrueFalseStatement[] = [
     correct: false,
     explain:
       'Auch Relationshiptypen können eine eigene Tabelle erhalten: Jede N:M-Beziehung wird zu einer eigenen Tabelle mit eigenem Primärschlüssel. Nur bei 1:N- und 1:1-Beziehungen ohne eigene Attribute entfällt die eigene Tabelle zugunsten eines Fremdschlüssels.',
+    reasons: [
+      'Auch N:M-Beziehungen (Relationshiptypen) werden zu eigenen Tabellen — nur 1:N-/1:1-Beziehungen ohne eigene Attribute werden stattdessen über Fremdschlüssel abgebildet.',
+      'Nur Relationshiptypen werden zu Tabellen, Entitytypen dagegen nie.',
+      'Weder Entitytypen noch Relationshiptypen werden direkt zu Tabellen, nur Attribute.',
+    ],
   },
   {
     id: 32,
@@ -242,6 +321,11 @@ export const STATEMENTS: TrueFalseStatement[] = [
     correct: false,
     explain:
       'Außenwirksame Informationssysteme verbinden ein Unternehmen mit Akteuren AUSSERHALB seiner Grenzen. Zwei Produktionsstätten desselben Unternehmens auszutauschen ist dagegen unternehmensintern — auch über Landesgrenzen hinweg bleibt es ein internes (kein außenwirksames) System.',
+    reasons: [
+      'Außenwirksame Systeme verbinden mit Akteuren außerhalb des Unternehmens — zwei Standorte derselben Firma sind auch über Landesgrenzen hinweg unternehmensintern.',
+      'Elektronische Übermittlung zwischen Ländern gilt automatisch immer als außenwirksam.',
+      'Es handelt sich um kein Informationssystem, sondern nur um eine einfache Datei-Übertragung.',
+    ],
   },
   {
     id: 34,
@@ -249,6 +333,11 @@ export const STATEMENTS: TrueFalseStatement[] = [
     correct: false,
     explain:
       'Bei der Bus-Topologie teilen sich alle Teilnehmer ein gemeinsames Übertragungsmedium — fällt DIESES Medium aus, fällt das Netz aus, nicht wenn ein einzelner Teilnehmer (Server) ausfällt. Rechnerausfall = Netzausfall gilt dagegen für die Ring-Topologie, Verteilerausfall = Netzausfall für die Stern-Topologie.',
+    reasons: [
+      'Bei der Bus-Topologie führt nur ein Ausfall des gemeinsamen Mediums zum Netzausfall — nicht der Ausfall eines einzelnen Teilnehmers wie eines Servers.',
+      'Bei der Bus-Topologie gibt es keine Server, nur gleichberechtigte Endgeräte.',
+      'Ein Server-Ausfall legt bei der Bus-Topologie nur die Hälfte des Netzes lahm, nicht das ganze.',
+    ],
   },
   {
     id: 35,
@@ -256,6 +345,11 @@ export const STATEMENTS: TrueFalseStatement[] = [
     correct: false,
     explain:
       '„Byte pro Pixel" ist ein Konzept der Pixelgrafik. Vektorgrafiken bestehen aus mathematisch beschriebenen Grundelementen (Linien, Kurven, Polygone) und haben gar keine Pixel, auf die sich eine Farbtiefe pro Bildpunkt anwenden ließe.',
+    reasons: [
+      'Vektorgrafiken bestehen aus mathematisch beschriebenen Elementen und haben gar keine Pixel, auf die sich „Byte pro Pixel" anwenden ließe.',
+      'Für 128 Farben werden 2 Byte pro Pixel benötigt, nicht 1.',
+      'Vektorgrafiken benötigen grundsätzlich mehr Speicher als Pixelgrafiken gleicher Farbtiefe.',
+    ],
   },
   {
     id: 36,
@@ -263,6 +357,11 @@ export const STATEMENTS: TrueFalseStatement[] = [
     correct: false,
     explain:
       'Beides sind zwar Ausschlusskriterien bei der Bewertung von Alternativen, aber unterschiedlicher Natur: K.O.-Anforderungen sind zwingende Muss-Kriterien, deren Fehlen zum Ausschluss führt; Antianforderungen beschreiben dagegen, was explizit NICHT vorhanden sein darf. Die beiden Konzepte sind nicht identisch und dürfen nicht gleichgesetzt werden.',
+    reasons: [
+      'K.O.-Anforderungen sind zwingende Muss-Kriterien; Antianforderungen beschreiben, was NICHT vorhanden sein darf — unterschiedliche Konzepte.',
+      'K.O.-Anforderungen gibt es nur im Recruiting, Antianforderungen nur in der Softwareentwicklung.',
+      'Beide Begriffe sind veraltete Synonyme für „Muss-Kriterien" und daher austauschbar.',
+    ],
   },
   {
     id: 37,
@@ -284,6 +383,11 @@ export const STATEMENTS: TrueFalseStatement[] = [
     correct: false,
     explain:
       'LoC zählt Zeilen im Quellcode/Programmcode — also in der konkreten, in einer Programmiersprache geschriebenen Implementierung. Der Algorithmus selbst ist die abstrakte, sprachunabhängige Beschreibung und hat keine „Zeilen" im LoC-Sinn.',
+    reasons: [
+      'LoC zählt Zeilen im konkreten Quellcode/Programmcode, nicht im abstrakten, sprachunabhängigen Algorithmus.',
+      'LoC zählt die Anzahl der Kommentarzeilen im Quellcode.',
+      'Ein Algorithmus hat per Definition genauso viele Zeilen wie der spätere Quellcode.',
+    ],
   },
   {
     id: 40,
@@ -291,6 +395,11 @@ export const STATEMENTS: TrueFalseStatement[] = [
     correct: false,
     explain:
       'Adaptionsart 1 (Auswahl aus der Softwarebibliothek) setzt eine Bibliothek vorgefertigter Module voraus, wie sie nur Standardsoftware-Anbieter haben. Individualsoftware wird komplett neu entwickelt — der Begriff „Adaptionsart" ist hier unabhängig vom Betriebsmodell nicht anwendbar.',
+    reasons: [
+      'Adaptionsart 1 (Auswahl aus der Softwarebibliothek) setzt eine Bibliothek vorgefertigter Module voraus — die gibt es bei komplett neu entwickelter Individualsoftware nicht.',
+      'Adaptionsart 1 ist ausschließlich mit On-Demand kombinierbar, nie mit On-Premise.',
+      'Individualsoftware kann grundsätzlich nicht On-Premise betrieben werden.',
+    ],
   },
   {
     id: 41,
@@ -305,6 +414,11 @@ export const STATEMENTS: TrueFalseStatement[] = [
     correct: false,
     explain:
       'Wie schon nach der Von-Neumann-Architektur festgelegt: Nur Code im Hauptspeicher kann direkt vom Prozessor ausgeführt werden. Code auf der Festplatte muss zuerst geladen werden.',
+    reasons: [
+      'Nach der Von-Neumann-Architektur kann die CPU nur Code ausführen, der im Hauptspeicher liegt — Code auf der Festplatte muss zuerst geladen werden.',
+      'Der Ausführungsort spielt nur bei sehr großen Programmen eine Rolle, bei kleinen nicht.',
+      'Die Festplatte ist Teil des Hauptspeichers, daher macht der Ort keinen Unterschied.',
+    ],
   },
   {
     id: 43,
@@ -312,6 +426,11 @@ export const STATEMENTS: TrueFalseStatement[] = [
     correct: false,
     explain:
       'Diese physikalische Grenze betrifft die Transistordichte auf einem Chip — also Moore’s Law, nicht Gilder’s Law. Gilder’s Law beschreibt die Verdopplung der Datenübertragungsrate im Netz und ist nicht direkt an die physische Transistorgröße gekoppelt.',
+    reasons: [
+      'Diese physikalische Grenze betrifft die Transistordichte (Moore’s Law), nicht die Datenübertragungsrate im Netz (Gilder’s Law).',
+      'Gilder’s Law wurde bereits vor dem Erreichen der Atomgröße widerlegt.',
+      'Gilder’s Law und Moore’s Law beschreiben exakt denselben Sachverhalt.',
+    ],
   },
   {
     id: 44,
@@ -326,6 +445,11 @@ export const STATEMENTS: TrueFalseStatement[] = [
     correct: false,
     explain:
       'Die Eindeutigkeitsregel gilt für TUPEL (Zeilen/Datensätze), nicht für Entitytypen. Ein Entitytyp ist eine Struktur/Klasse (z. B. „Kunde"), keine einzelne Zeile — die Formulierung verwechselt die Ebenen.',
+    reasons: [
+      'Die Eindeutigkeitsregel gilt für Tupel (Zeilen), nicht für Entitytypen — ein Entitytyp ist eine Struktur/Klasse, keine einzelne Zeile.',
+      'Im relationalen Modell dürfen generell beliebig viele identische Elemente auf jeder Ebene vorkommen.',
+      'Entitytypen werden im relationalen Modell gar nicht verwendet, nur Tupel.',
+    ],
   },
   {
     id: 46,
@@ -333,6 +457,11 @@ export const STATEMENTS: TrueFalseStatement[] = [
     correct: false,
     explain:
       'Entscheidend für die Einordnung ist der AUSLÖSER, nicht die Verpackung: Eine gesetzlich vorgeschriebene Anpassung an geänderte äußere Rahmenbedingungen ist adaptive Wartung — unabhängig davon, ob sie als Update oder (wie hier) als Upgrade mit neuer Transaktion ausgeliefert wird. Enhasive Wartung wäre es, wenn der Fachbereich selbst neue Funktionen wünscht.',
+    reasons: [
+      'Entscheidend ist der Auslöser, nicht die Verpackung: Eine gesetzlich vorgeschriebene Anpassung ist adaptive Wartung, unabhängig davon ob sie als Update oder Upgrade kommt.',
+      'Da eine neue Transaktion per Upgrade bereitgestellt wird, handelt es sich automatisch um perfektive Wartung.',
+      'Gesetzliche Anforderungen zählen grundsätzlich als korrektive Wartung, da ein „Fehler" im rechtlichen Sinn behoben wird.',
+    ],
   },
   {
     id: 47,
