@@ -34,6 +34,8 @@ export interface SapFormField {
   /** Erwarteter Wert bzw. akzeptierte Varianten (case-insensitive verglichen) — null heißt: Feld muss LEER bleiben. */
   expected: string | string[] | null;
   group: string;
+  /** Pflichtfeld — wird wie im echten SAP-Bildschirm mit einem Stern (*) hinter dem Label markiert. */
+  required?: boolean;
 }
 
 export interface SapGivenField {

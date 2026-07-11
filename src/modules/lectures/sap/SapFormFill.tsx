@@ -115,6 +115,11 @@ export function SapFormFill({
       <p className="text-[12.5px] font-semibold" style={{ color }}>
         {challenge.instructions}
       </p>
+      {challenge.fields.some((f) => f.required) && (
+        <p className="text-[11px] text-sub -mt-2">
+          <span style={{ color: 'var(--bad)' }}>*</span> Pflichtfeld
+        </p>
+      )}
 
       {/* SAP-Bildschirm-Nachbau */}
       <div className="rounded-2xl border overflow-hidden" style={{ borderColor: 'var(--line)' }}>
@@ -150,7 +155,15 @@ export function SapFormFill({
                     const status = fieldStatus(field.id);
                     return (
                       <label key={field.id} className="flex flex-col gap-1">
-                        <span className="text-[11px] font-semibold text-sub">{field.label}</span>
+                        <span className="text-[11px] font-semibold text-sub">
+                          {field.label}
+                          {field.required && (
+                            <span style={{ color: 'var(--bad)' }} aria-hidden>
+                              {' '}
+                              *
+                            </span>
+                          )}
+                        </span>
                         {field.kind === 'select' ? (
                           <select
                             value={values[field.id] ?? ''}
