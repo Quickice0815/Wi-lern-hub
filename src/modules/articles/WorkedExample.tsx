@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigator } from '../../lib/navigation';
 import { useCloudProgress } from '../../lib/progress';
 import { BackBar, Card, FeedbackBox, OptionButton, PageShell, PrimaryButton, SecondaryButton } from '../../components/ui';
@@ -7,6 +7,16 @@ import type { ArticlesProgress } from './progressTypes';
 import { ShingleLab } from './ShingleLab';
 
 type Phase = 'learn' | 'practice' | 'exercise';
+
+/** Zufällige Reihenfolge der Options-Indizes, damit die richtige Antwort nicht immer auf Position A/B liegt. */
+function shuffledOrder(n: number): number[] {
+  const order = Array.from({ length: n }, (_, i) => i);
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  return order;
+}
 
 // Pendant zu WorkedExampleView.swift — zwei Phasen: erst die
 // Schritt-für-Schritt-Erklärung ("So funktioniert's"), dann eine
@@ -176,17 +186,19 @@ function ExerciseContent({
   correct: boolean;
   onPick: (oi: number) => void;
 }) {
+  const order = useMemo(() => shuffledOrder(options.length), [options]);
+
   return (
     <div className="flex flex-col gap-3.5">
       <span className="text-warn text-[13px] font-bold">{intro}</span>
       <h2 className="text-ink text-[16.5px] font-bold leading-snug">{question}</h2>
 
       <div className="flex flex-col gap-2.5">
-        {options.map((opt, oi) => (
+        {order.map((oi, displayPos) => (
           <OptionButton
             key={oi}
-            index={oi}
-            label={opt}
+            index={displayPos}
+            label={options[oi]}
             answered={answered}
             isCorrectOption={oi === correctIndex}
             isPicked={oi === picked}
