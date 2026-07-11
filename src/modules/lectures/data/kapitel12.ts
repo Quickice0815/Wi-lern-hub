@@ -235,12 +235,12 @@ export const kapitel12: LectureChapter = {
           { label: 'Buchungsbelegart', value: 'KZ' },
         ],
         fields: [
-          { id: 'buchungsdatum', label: 'Buchungsdatum', kind: 'text', expected: ['31.05.2024', '31.5.2024'], group: 'Allgemeine Informationen' },
+          { id: 'buchungsdatum', label: 'Buchungsdatum', kind: 'text', expected: ['31.05.2024', '31.5.2024'], group: 'Allgemeine Informationen', required: true },
           { id: 'valutadatum', label: 'Valutadatum', kind: 'text', expected: null, group: 'Allgemeine Informationen' },
           { id: 'referenz', label: 'Referenz', kind: 'text', expected: null, group: 'Allgemeine Informationen' },
           { id: 'kopftext', label: 'Kopftext', kind: 'text', expected: null, group: 'Allgemeine Informationen' },
-          { id: 'sachkonto', label: 'Sachkonto (Bankkonto)', kind: 'text', expected: '1800000', group: 'Bankdaten' },
-          { id: 'betrag', label: 'Betrag', kind: 'text', expected: ['2546,00', '2546', '2.546,00'], group: 'Bankdaten' },
+          { id: 'sachkonto', label: 'Sachkonto (Bankkonto)', kind: 'text', expected: '1800000', group: 'Bankdaten', required: true },
+          { id: 'betrag', label: 'Betrag', kind: 'text', expected: ['2546,00', '2546', '2.546,00'], group: 'Bankdaten', required: true },
           { id: 'gebuehren', label: 'Gebühren', kind: 'text', expected: null, group: 'Bankdaten' },
           {
             id: 'kontoart',
@@ -249,8 +249,9 @@ export const kapitel12: LectureChapter = {
             options: ['Debitor', 'Kreditor', 'Sachkonto'],
             expected: 'Kreditor',
             group: 'Auswahl offener Posten',
+            required: true,
           },
-          { id: 'kontoid', label: 'Konto-ID', kind: 'text', expected: '211999', group: 'Auswahl offener Posten' },
+          { id: 'kontoid', label: 'Konto-ID', kind: 'text', expected: '211999', group: 'Auswahl offener Posten', required: true },
         ],
         openItemsLabel: 'Offenen Posten auswählen',
         openItemChoices: [
@@ -267,6 +268,94 @@ export const kapitel12: LectureChapter = {
           '— das Jahr ergibt sich aus dem gegebenen Buchungsbelegdatum 16.07.2024), das Bankkonto als Sachkonto, der Betrag ' +
           'sowie Kontoart „Kreditor" mit der Konto-ID 211999. Über „Posten anzeigen" werden die offenen Posten geladen, der zum ' +
           'Betrag passende Posten (-2.546,00 EUR) wird ausgeglichen, danach wird gebucht.',
+      },
+      {
+        id: 'rechnungseingang',
+        title: 'Eingangsrechnung buchen',
+        screenTitle: 'Kreditorenrechnung erfassen',
+        scenario:
+          'Am 03.09.2024 erhalten Sie eine Eingangsrechnung des Lieferanten Bergmann GmbH (Kreditorenkonto 210500) über ' +
+          '4.760,00 EUR für gelieferte Büromaterialien, die auf dem Aufwandskonto 6800000 gebucht werden sollen. Die Rechnung ' +
+          'wurde am 30.08.2024 ausgestellt und ist laut Zahlungsbedingung innerhalb von 30 Tagen fällig.',
+        instructions: 'Füllen Sie den Bildschirm nur mit den relevanten Feldern aus. Nicht benötigte Felder bleiben leer.',
+        givenFields: [
+          { label: 'Buchungskreis', value: 'DE00' },
+          { label: 'Buchungsbelegdatum', value: '03.09.2024' },
+          { label: 'Buchungsbelegart', value: 'RE' },
+        ],
+        fields: [
+          { id: 'rechnungsdatum', label: 'Rechnungsdatum', kind: 'text', expected: ['30.08.2024', '30.8.2024'], group: 'Allgemeine Informationen', required: true },
+          { id: 'referenz', label: 'Referenz', kind: 'text', expected: null, group: 'Allgemeine Informationen' },
+          { id: 'kreditorenkonto', label: 'Kreditorenkonto', kind: 'text', expected: '210500', group: 'Rechnungsdaten', required: true },
+          { id: 'betrag', label: 'Betrag', kind: 'text', expected: ['4760,00', '4760', '4.760,00'], group: 'Rechnungsdaten', required: true },
+          { id: 'sachkonto', label: 'Sachkonto (Aufwand)', kind: 'text', expected: '6800000', group: 'Rechnungsdaten', required: true },
+          { id: 'steuerkennzeichen', label: 'Steuerkennzeichen', kind: 'text', expected: null, group: 'Rechnungsdaten' },
+          {
+            id: 'zahlungsbedingung',
+            label: 'Zahlungsbedingung',
+            kind: 'select',
+            options: ['Sofort netto', '30 Tage netto', '14 Tage 2% Skonto'],
+            expected: '30 Tage netto',
+            group: 'Zahlungsdaten',
+            required: true,
+          },
+        ],
+        buttons: [
+          { id: 'simulieren', label: 'Simulieren' },
+          { id: 'buchen', label: 'Buchen' },
+        ],
+        explanation:
+          'Bei einer Eingangsrechnung wird kein offener Posten ausgewählt, sondern ein neuer erzeugt: Kreditorenkonto, ' +
+          'Sachkonto (Aufwand), Betrag, Rechnungsdatum und die passende Zahlungsbedingung sind die entscheidenden Pflichtfelder. ' +
+          'Referenz und Steuerkennzeichen sind für diese Übung nicht relevant und bleiben leer.',
+      },
+      {
+        id: 'zahlungseingang-debitor',
+        title: 'Zahlungseingang von Kunde buchen',
+        screenTitle: 'Zahlung',
+        scenario:
+          'Am 12.09.2024 geht auf dem Bankkonto 1800000 eine Zahlung eines Kunden ein: Die Firma Nordlicht Handels GmbH ' +
+          '(Debitorenkonto 120300) hat ihre offene Rechnung über 1.890,50 EUR beglichen. Der Zahlungseingang soll in der ' +
+          'Buchhaltungsperiode September 2024 verbucht werden.',
+        instructions: 'Füllen Sie den Bildschirm nur mit den relevanten Feldern aus. Nicht benötigte Felder bleiben leer.',
+        givenFields: [
+          { label: 'Buchungskreis', value: 'DE00' },
+          { label: 'Buchungsbelegdatum', value: '12.09.2024' },
+          { label: 'Buchungsbelegart', value: 'DZ' },
+        ],
+        fields: [
+          { id: 'buchungsdatum', label: 'Buchungsdatum', kind: 'text', expected: ['30.09.2024', '30.9.2024'], group: 'Allgemeine Informationen', required: true },
+          { id: 'valutadatum', label: 'Valutadatum', kind: 'text', expected: null, group: 'Allgemeine Informationen' },
+          { id: 'referenz', label: 'Referenz', kind: 'text', expected: null, group: 'Allgemeine Informationen' },
+          { id: 'sachkonto', label: 'Sachkonto (Bankkonto)', kind: 'text', expected: '1800000', group: 'Bankdaten', required: true },
+          { id: 'betrag', label: 'Betrag', kind: 'text', expected: ['1890,50', '1890.5', '1.890,50'], group: 'Bankdaten', required: true },
+          { id: 'gebuehren', label: 'Gebühren', kind: 'text', expected: null, group: 'Bankdaten' },
+          {
+            id: 'kontoart',
+            label: 'Kontoart/Konto-ID',
+            kind: 'select',
+            options: ['Debitor', 'Kreditor', 'Sachkonto'],
+            expected: 'Debitor',
+            group: 'Auswahl offener Posten',
+            required: true,
+          },
+          { id: 'kontoid', label: 'Konto-ID', kind: 'text', expected: '120300', group: 'Auswahl offener Posten', required: true },
+        ],
+        openItemsLabel: 'Offenen Posten auswählen',
+        openItemChoices: [
+          { id: 'p1', label: '2000000015 · -1.890,50 EUR', correct: true },
+          { id: 'p2', label: '2000000022 · -2.150,00 EUR', correct: false },
+          { id: 'p3', label: '2000000031 · -1.890,50 EUR', correct: false },
+        ],
+        buttons: [
+          { id: 'posten', label: 'Posten anzeigen' },
+          { id: 'buchen', label: 'Buchen' },
+        ],
+        explanation:
+          'Ausgefüllt werden nur die für diesen Zahlungseingang nötigen Felder: Buchungsdatum (ein Tag im September 2024, ' +
+          'damit die Periode passt), das Bankkonto als Sachkonto, der Betrag sowie Kontoart „Debitor" mit der Konto-ID 120300. ' +
+          'Über „Posten anzeigen" wird der Posten ausgewählt, der exakt zu Betrag UND Debitorennummer passt (2000000015) — ' +
+          'nicht der Posten mit zufällig demselben Betrag, aber anderer Belegnummer (2000000031).',
       },
     ],
     errorCases: [
@@ -329,6 +418,126 @@ export const kapitel12: LectureChapter = {
         explanation:
           'Es wird nur festgestellt, dass das Pflichtfeld leer geblieben ist — nicht, ob ein eingetragener Wert korrekt formatiert ' +
           'oder plausibel wäre. Das ist eine Vollständigkeitsprüfung.',
+      },
+      {
+        id: 'format-kreditorenkonto',
+        title: 'Fehlermeldung 5: Kreditorenkonto mit falscher Stellenzahl',
+        screenTitle: 'Kreditorenrechnung erfassen',
+        scenario: 'Beim Erfassen einer Kreditorenrechnung wird folgende Kontonummer eingegeben.',
+        belegLines: [
+          { konto: '21050099', soll: '0,00', haben: '4760,00', highlight: true },
+          { konto: '6800000', soll: '4760,00', haben: '0,00' },
+        ],
+        errorMessage: 'Feld Kreditorenkonto: Eingabe „21050099" hat 8 Stellen — erwartet werden genau 6 Stellen.',
+        correctPruefungsart: 'format',
+        explanation:
+          'Auch hier wird ausschließlich die Stellenzahl der Eingabe kontrolliert, unabhängig davon, ob ein Kreditor mit ' +
+          'dieser Nummer existiert. Das ist eine Formatprüfung.',
+      },
+      {
+        id: 'format-buchungsdatum',
+        title: 'Fehlermeldung 6: Ungültiges Datumsformat',
+        screenTitle: 'Zahlung',
+        scenario: 'Ein Sachbearbeiter trägt das Buchungsdatum in folgender Schreibweise ein.',
+        belegLines: [
+          { konto: '1800000', soll: '0,00', haben: '2546,00', highlight: true },
+          { konto: '211999', soll: '2546,00', haben: '0,00' },
+        ],
+        errorMessage: 'Feld Buchungsdatum: Eingabe „16.07.24" entspricht nicht dem vorgeschriebenen Format TT.MM.JJJJ.',
+        correctPruefungsart: 'format',
+        explanation:
+          'Geprüft wird nur, ob die Eingabe dem vorgeschriebenen Muster (vierstelliges Jahr) entspricht — nicht, ob das Datum ' +
+          'an sich plausibel ist. Das ist eine Formatprüfung.',
+      },
+      {
+        id: 'ausschluss-kreditor',
+        title: 'Fehlermeldung 7: Unbekannter Kreditor',
+        screenTitle: 'Kreditorenrechnung erfassen',
+        scenario: 'Beim Buchen einer Eingangsrechnung wird folgender Kreditor referenziert.',
+        belegLines: [
+          { konto: '305000', soll: '0,00', haben: '1200,00', highlight: true },
+          { konto: '6800000', soll: '1200,00', haben: '0,00' },
+        ],
+        errorMessage: 'Kreditor 305000 ist im Buchungskreis DE00 nicht angelegt.',
+        correctPruefungsart: 'ausschluss',
+        explanation:
+          'Es wird geprüft, ob es diesen Kreditor im System überhaupt gibt — nicht sein Format und nicht der Buchungsbetrag. ' +
+          'Das ist eine Ausschlussprüfung.',
+      },
+      {
+        id: 'ausschluss-kostenstelle',
+        title: 'Fehlermeldung 8: Unbekannte Kostenstelle',
+        screenTitle: 'Hauptbuchbelege buchen',
+        scenario: 'Bei der Kontierung eines Aufwandspostens wird folgende Kostenstelle angegeben.',
+        belegLines: [
+          { konto: '6800000', soll: '950,00', haben: '0,00', highlight: true },
+          { konto: '210500', soll: '0,00', haben: '950,00' },
+        ],
+        errorMessage: 'Kostenstelle 9999 ist im Kostenrechnungskreis KR00 nicht vorgesehen.',
+        correctPruefungsart: 'ausschluss',
+        explanation:
+          'Wie beim Sachkonto wird auch bei der Kostenstelle geprüft, ob der eingegebene Wert im System existiert. Da ' +
+          'Kostenstelle 9999 nicht angelegt ist, greift eine Ausschlussprüfung.',
+      },
+      {
+        id: 'plausibilitaet-betrag',
+        title: 'Fehlermeldung 9: Unplausibel hoher Betrag',
+        screenTitle: 'Kreditorenrechnung erfassen',
+        scenario: 'Für eine einfache Büromaterial-Rechnung wird folgender Betrag eingegeben.',
+        belegLines: [
+          { konto: '6800000', soll: '999999999,99', haben: '0,00', highlight: true },
+          { konto: '210500', soll: '0,00', haben: '999999999,99' },
+        ],
+        errorMessage: 'Betrag 999.999.999,99 EUR liegt außerhalb des für diesen Beleg plausiblen Rahmens.',
+        correctPruefungsart: 'plausibilitaet',
+        explanation:
+          'Das Zahlenformat ist an sich korrekt — geprüft wird aber, ob der Betrag inhaltlich sinnvoll ist. Ein neunstelliger ' +
+          'Betrag für eine Büromaterial-Rechnung ist unplausibel. Das ist eine Plausibilitätsprüfung.',
+      },
+      {
+        id: 'plausibilitaet-faelligkeit',
+        title: 'Fehlermeldung 10: Fälligkeit vor Buchungsdatum',
+        screenTitle: 'Kreditorenrechnung erfassen',
+        scenario: 'Bei einer Rechnung mit Buchungsdatum 03.09.2024 wird folgende Fälligkeit hinterlegt.',
+        belegLines: [
+          { konto: '210500', soll: '0,00', haben: '4760,00', highlight: true },
+          { konto: '6800000', soll: '4760,00', haben: '0,00' },
+        ],
+        errorMessage: 'Fälligkeitsdatum 01.01.2020 liegt vor dem Buchungsdatum 03.09.2024.',
+        correctPruefungsart: 'plausibilitaet',
+        explanation:
+          'Format und Kontenexistenz sind in Ordnung — inhaltlich ergibt eine Fälligkeit in der Vergangenheit, lange vor dem ' +
+          'Buchungsdatum, aber keinen Sinn. Das ist eine Plausibilitätsprüfung.',
+      },
+      {
+        id: 'vollstaendigkeit-belegart',
+        title: 'Fehlermeldung 11: Fehlende Buchungsbelegart',
+        screenTitle: 'Zahlung',
+        scenario: 'Beim Versuch, einen Zahlungsbeleg zu buchen, fehlt folgende Angabe.',
+        belegLines: [
+          { konto: '1800000', soll: '0,00', haben: '2546,00', highlight: true },
+          { konto: '211999', soll: '2546,00', haben: '0,00' },
+        ],
+        errorMessage: 'Feld Buchungsbelegart ist ein Pflichtfeld und muss ausgefüllt werden.',
+        correctPruefungsart: 'vollstaendigkeit',
+        explanation:
+          'Es wird nur festgestellt, dass ein Pflichtfeld leer geblieben ist, nicht ob ein eingetragener Wert korrekt wäre. ' +
+          'Das ist eine Vollständigkeitsprüfung.',
+      },
+      {
+        id: 'vollstaendigkeit-betrag',
+        title: 'Fehlermeldung 12: Fehlender Betrag',
+        screenTitle: 'Kreditorenrechnung erfassen',
+        scenario: 'Beim Versuch, eine Kreditorenrechnung zu buchen, fehlt folgende Angabe.',
+        belegLines: [
+          { konto: '210500', soll: '0,00', haben: '0,00', highlight: true },
+          { konto: '6800000', soll: '0,00', haben: '0,00' },
+        ],
+        errorMessage: 'Feld Betrag ist ein Pflichtfeld und muss ausgefüllt werden.',
+        correctPruefungsart: 'vollstaendigkeit',
+        explanation:
+          'Auch hier wird nur geprüft, ob überhaupt ein Wert im Pflichtfeld „Betrag" steht — nicht, ob dieser Wert plausibel ' +
+          'oder korrekt formatiert ist. Das ist eine Vollständigkeitsprüfung.',
       },
     ],
   },
