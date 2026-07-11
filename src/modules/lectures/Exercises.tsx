@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   BackBar,
   Card,
@@ -12,6 +12,16 @@ import { DIFFICULTY_LABELS, type LectureDifficulty, type LectureQuestion } from 
 
 interface AnswerRecord {
   correct: boolean;
+}
+
+/** Zufällige Reihenfolge der Options-Indizes, damit die richtige Antwort nicht immer auf Position A/B liegt. */
+function shuffledOrder(n: number): number[] {
+  const order = Array.from({ length: n }, (_, i) => i);
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  return order;
 }
 
 // Multiple-Choice-Übungsrunde für eine Schwierigkeitsstufe — eine Frage
@@ -37,6 +47,7 @@ export function LectureExercises({
   const question = questions[index];
   const answered = picked !== null;
   const isCorrect = answered && picked === question.correct;
+  const order = useMemo(() => shuffledOrder(question.options.length), [index, question]);
 
   function choose(oi: number) {
     if (answered) return;
@@ -83,11 +94,11 @@ export function LectureExercises({
       <Card className="p-[22px] flex flex-col gap-4">
         <p className="text-ink font-bold text-[17px] leading-snug">{question.q}</p>
         <div className="flex flex-col gap-[9px]">
-          {question.options.map((opt, oi) => (
+          {order.map((oi, displayPos) => (
             <OptionButton
               key={oi}
-              index={oi}
-              label={opt}
+              index={displayPos}
+              label={question.options[oi]}
               answered={answered}
               isCorrectOption={oi === question.correct}
               isPicked={picked === oi}

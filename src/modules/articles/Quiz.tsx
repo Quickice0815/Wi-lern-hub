@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigator } from '../../lib/navigation';
 import { useCloudProgress } from '../../lib/progress';
 import {
@@ -16,6 +16,16 @@ import type { ArticlesProgress } from './progressTypes';
 
 interface AnswerRecord {
   correct: boolean;
+}
+
+/** Zufällige Reihenfolge der Options-Indizes, damit die richtige Antwort nicht immer auf Position A/B liegt. */
+function shuffledOrder(n: number): number[] {
+  const order = Array.from({ length: n }, (_, i) => i);
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  return order;
 }
 
 // Pendant zu QuizView.swift — eine Frage nach der anderen, direkte
@@ -42,6 +52,7 @@ export function Quiz({ articleId }: { articleId: string }) {
   const question = article.questions[index];
   const answered = picked !== null;
   const isCorrect = answered && picked === question.correct;
+  const order = useMemo(() => shuffledOrder(question.options.length), [index, question]);
 
   function choose(oi: number) {
     if (answered) return;
@@ -133,11 +144,11 @@ export function Quiz({ articleId }: { articleId: string }) {
             <h2 className="text-ink text-[18px] font-bold leading-snug">{question.q}</h2>
 
             <div className="flex flex-col gap-2.5">
-              {question.options.map((opt, oi) => (
+              {order.map((oi, displayPos) => (
                 <OptionButton
                   key={oi}
-                  index={oi}
-                  label={opt}
+                  index={displayPos}
+                  label={question.options[oi]}
                   answered={answered}
                   isCorrectOption={oi === question.correct}
                   isPicked={oi === picked}
