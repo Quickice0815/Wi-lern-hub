@@ -84,6 +84,7 @@ export function EnglishTrainer() {
   const [writingQueue, setWritingQueue] = useState<WritingExample[]>([]);
   const [idx, setIdx] = useState(0);
   const [revealed, setRevealed] = useState(false);
+  const [advancing, setAdvancing] = useState(false);
   const [graded, setGraded] = useState(0);
 
   const now = Date.now();
@@ -111,6 +112,7 @@ export function EnglishTrainer() {
     setFlipQueue(shuffled([...reviewCards, ...newCards]).map(vocabToFace));
     setIdx(0);
     setRevealed(false);
+    setAdvancing(false);
     setGraded(0);
     setPhase('session');
   }
@@ -124,6 +126,7 @@ export function EnglishTrainer() {
     setFlipQueue(shuffled(due).map(phraseToFace));
     setIdx(0);
     setRevealed(false);
+    setAdvancing(false);
     setGraded(0);
     setPhase('session');
   }
@@ -137,6 +140,7 @@ export function EnglishTrainer() {
     setWritingQueue(shuffled(due));
     setIdx(0);
     setRevealed(false);
+    setAdvancing(false);
     setGraded(0);
     setPhase('session');
   }
@@ -157,7 +161,19 @@ export function EnglishTrainer() {
     setProgress((prev) => ({ ...prev, [currentId]: gradeCard(prev[currentId] ?? newCardState(), g) }));
     setGraded((c) => c + 1);
     setRevealed(false);
-    setIdx((i) => i + 1);
+
+    if (activeKind === 'flip') {
+      // Erst die Flip-zurück-Animation der aktuellen Karte fertig abspielen lassen
+      // (Flashcard nutzt transition-transform duration-500), sonst wechselt der
+      // Karteninhalt schon auf das nächste Wort, während die alte Karte noch dreht.
+      setAdvancing(true);
+      window.setTimeout(() => {
+        setIdx((i) => i + 1);
+        setAdvancing(false);
+      }, 500);
+    } else {
+      setIdx((i) => i + 1);
+    }
   }
 
   return (
@@ -185,6 +201,7 @@ export function EnglishTrainer() {
           face={flipQueue[idx]}
           state={progress[flipQueue[idx].id]}
           revealed={revealed}
+          advancing={advancing}
           onToggle={() => setRevealed((f) => !f)}
           onGrade={grade}
           index={idx}
@@ -415,6 +432,7 @@ function FlipSessionView({
   face,
   state,
   revealed,
+  advancing,
   onToggle,
   onGrade,
   index,
@@ -423,6 +441,7 @@ function FlipSessionView({
   face: { front: CardFace; back: CardFace; id: string };
   state: CardState | undefined;
   revealed: boolean;
+  advancing: boolean;
   onToggle: () => void;
   onGrade: (g: Grade) => void;
   index: number;
@@ -432,9 +451,9 @@ function FlipSessionView({
     <div className="flex flex-col gap-4">
       <SessionProgress index={index} total={total} />
 
-      <Flashcard front={face.front} back={face.back} flipped={revealed} onFlip={onToggle} />
+      <Flashcard front={face.front} back={face.back} flipped={revealed} onFlip={() => !advancing && onToggle()} />
 
-      {!revealed && (
+      {!revealed && !advancing && (
         <SecondaryButton onClick={onToggle} className="self-center">
           Umdrehen
         </SecondaryButton>
