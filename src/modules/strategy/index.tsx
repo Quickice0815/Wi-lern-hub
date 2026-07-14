@@ -1,6 +1,13 @@
 import { useState } from 'react';
 import { useNavigator } from '../../lib/navigation';
 import { useCloudProgress } from '../../lib/progress';
+import type { AreaKey, CaseStudy, DiagramDef, Difficulty, TermMatchSet } from './types';
+import { DIFFICULTY_INFO } from './types';
+import { DIAGRAMS, CASE_STUDIES, TERM_MATCH_SETS } from './data';
+import { DiagramLabeling } from './DiagramLabeling';
+import { CaseStudyPriority } from './CaseStudyPriority';
+import { TermMatch } from './TermMatch';
+import { StrategyTutorial } from './Tutorial';
 
 /* ============================================================
    DESIGN TOKENS
@@ -1702,7 +1709,6 @@ const strategieModules: Module[] = [
 /* ============================================================
    APP
    ============================================================ */
-type AreaKey = "fuehrung" | "strategie";
 
 const AREAS: Record<AreaKey, { label: string; subtitle: string; modules: Module[]; accent: string }> = {
   fuehrung: {
@@ -1719,8 +1725,68 @@ const AREAS: Record<AreaKey, { label: string; subtitle: string; modules: Module[
   },
 };
 
-type DoneState = Record<AreaKey, Record<number, boolean>>;
-const initialDone: DoneState = { fuehrung: {}, strategie: {} };
+/* ------------------------------------------------------------
+   ÜBEN-MODUS — Diagramme beschriften, Fallstudien einsortieren,
+   Lückentext-Matching. Je Bereich (Führung/Strategie) ein eigener
+   Übungspool, gefiltert nach Schwierigkeitsstufe.
+   ------------------------------------------------------------ */
+type ExerciseKind = 'diagram' | 'case' | 'term';
+type PracticeView =
+  | { kind: 'menu' }
+  | { kind: 'levelSelect'; exercise: ExerciseKind }
+  | { kind: ExerciseKind; difficulty: Difficulty; index: number }
+  | { kind: 'done'; exercise: ExerciseKind; difficulty: Difficulty };
+
+const EXERCISE_INFO: Record<ExerciseKind, { icon: string; title: string; desc: string }> = {
+  diagram: {
+    icon: '📊',
+    title: 'Diagramme beschriften',
+    desc: 'Achsen und Felder Schritt für Schritt richtig platzieren.',
+  },
+  case: {
+    icon: '🧭',
+    title: 'Fallstudien anwenden',
+    desc: 'Beobachtungen per Drag & Drop in die richtige Zelle einsortieren.',
+  },
+  term: {
+    icon: '✏️',
+    title: 'Lückentext-Matching',
+    desc: 'Fachbegriffe aktiv in Definitionstexte einsetzen statt nur zu lesen.',
+  },
+};
+
+const DIFFICULTY_ORDER: Difficulty[] = ['anfaenger', 'fortgeschritten', 'profi'];
+
+function listFor(area: AreaKey, kind: ExerciseKind): (DiagramDef | CaseStudy | TermMatchSet)[] {
+  const pool = kind === 'diagram' ? DIAGRAMS : kind === 'case' ? CASE_STUDIES : TERM_MATCH_SETS;
+  return pool.filter((item) => item.area === area);
+}
+
+function listForLevel(area: AreaKey, kind: ExerciseKind, difficulty: Difficulty) {
+  return listFor(area, kind).filter((item) => item.difficulty === difficulty);
+}
+
+interface PracticeDoneState {
+  diagrams: string[];
+  cases: string[];
+  terms: string[];
+}
+const initialPracticeDone: PracticeDoneState = { diagrams: [], cases: [], terms: [] };
+
+interface DoneState {
+  fuehrung: Record<number, boolean>;
+  strategie: Record<number, boolean>;
+  practiceFuehrung: PracticeDoneState;
+  practiceStrategie: PracticeDoneState;
+  practiceTutorialSeen: boolean;
+}
+const initialDone: DoneState = {
+  fuehrung: {},
+  strategie: {},
+  practiceFuehrung: initialPracticeDone,
+  practiceStrategie: initialPracticeDone,
+  practiceTutorialSeen: false,
+};
 
 function HomeScreen({
   onSelect,
@@ -1823,9 +1889,11 @@ function HomeScreen({
 export function StrategyHub() {
   const nav = useNavigator();
   const [area, setArea] = useState<AreaKey | null>(null);
+  const [mode, setMode] = useState<'learn' | 'practice'>('learn');
   const [idx, setIdx] = useState(0);
   const [quizState, setQuizState] = useState<QuizStateMap>({});
-  const [done, setDone] = useCloudProgress<DoneState>("strategyFuehrung", initialDone);
+  const [practiceView, setPracticeView] = useState<PracticeView>({ kind: 'menu' });
+  const [done, setDone] = useCloudProgress<DoneState>('strategyFuehrung', initialDone);
 
   if (!area) {
     return (
@@ -1833,6 +1901,8 @@ export function StrategyHub() {
         onSelect={(key) => {
           setArea(key);
           setIdx(0);
+          setMode('learn');
+          setPracticeView({ kind: 'menu' });
         }}
         onExit={() => nav.pop()}
         done={done}
@@ -1848,6 +1918,9 @@ export function StrategyHub() {
   const progress = Math.round(((idx + 1) / total) * 100);
   const areaDone = done[area] || {};
 
+  const practiceKey = area === 'fuehrung' ? 'practiceFuehrung' : 'practiceStrategie';
+  const practiceDone = done[practiceKey];
+
   const goTo = (i: number) => {
     setIdx(Math.max(0, Math.min(total - 1, i)));
     window.scrollTo?.(0, 0);
@@ -1859,6 +1932,44 @@ export function StrategyHub() {
   };
 
   const goHome = () => setArea(null);
+
+  function doneListFor(kind: ExerciseKind) {
+    return kind === 'diagram' ? practiceDone.diagrams : kind === 'case' ? practiceDone.cases : practiceDone.terms;
+  }
+
+  function markPracticeCompleted(kind: ExerciseKind, id: string) {
+    setDone((prev) => {
+      const listKey = kind === 'diagram' ? 'diagrams' : kind === 'case' ? 'cases' : 'terms';
+      const current = prev[practiceKey];
+      if (current[listKey].includes(id)) return prev;
+      return { ...prev, [practiceKey]: { ...current, [listKey]: [...current[listKey], id] } };
+    });
+  }
+
+  const currentArea = area;
+  const advancePractice = (kind: ExerciseKind, difficulty: Difficulty) => {
+    const items = listForLevel(currentArea, kind, difficulty);
+    const current = practiceView.kind === kind ? (practiceView as { index: number }).index : 0;
+    markPracticeCompleted(kind, items[current].id);
+    if (current + 1 < items.length) {
+      setPracticeView({ kind, difficulty, index: current + 1 });
+    } else {
+      setPracticeView({ kind: 'done', exercise: kind, difficulty });
+    }
+  };
+
+  function practiceGoBack() {
+    if (practiceView.kind === 'menu') return;
+    if (practiceView.kind === 'levelSelect') {
+      setPracticeView({ kind: 'menu' });
+    } else {
+      const exercise = practiceView.kind === 'done' ? practiceView.exercise : practiceView.kind;
+      setPracticeView({ kind: 'levelSelect', exercise });
+    }
+  }
+
+  const totalPracticeDone = practiceDone.diagrams.length + practiceDone.cases.length + practiceDone.terms.length;
+  const totalPracticeAll = listFor(area, 'diagram').length + listFor(area, 'case').length + listFor(area, 'term').length;
 
   return (
     <div
@@ -1916,157 +2027,544 @@ export function StrategyHub() {
           Klausurvorbereitung · Hochschule Coburg
         </div>
 
-        <div
-          style={{
-            height: 6,
-            background: C.panel2,
-            borderRadius: 999,
-            marginBottom: 18,
-            overflow: "hidden",
-          }}
-        >
-          <div
-            style={{
-              width: `${progress}%`,
-              height: "100%",
-              background: accent,
-              transition: "width .3s",
-            }}
-          />
-        </div>
-
-        {modules.map((m, i) => (
+        <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
           <button
-            key={m.num}
-            onClick={() => goTo(i)}
+            onClick={() => setMode('learn')}
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              width: "100%",
-              textAlign: "left",
-              background: i === idx ? C.panel2 : "transparent",
-              border: "none",
+              flex: 1,
+              padding: "8px 6px",
               borderRadius: 8,
-              padding: "8px 10px",
-              marginBottom: 2,
+              border: `1px solid ${mode === 'learn' ? accent : C.border}`,
+              background: mode === 'learn' ? `${accent}22` : "transparent",
+              color: mode === 'learn' ? accent : C.muted,
+              fontSize: 12,
+              fontWeight: 700,
               cursor: "pointer",
-              color: i === idx ? C.text : C.muted,
             }}
           >
-            <span
+            📖 Lernen
+          </button>
+          <button
+            onClick={() => setMode('practice')}
+            style={{
+              flex: 1,
+              padding: "8px 6px",
+              borderRadius: 8,
+              border: `1px solid ${mode === 'practice' ? accent : C.border}`,
+              background: mode === 'practice' ? `${accent}22` : "transparent",
+              color: mode === 'practice' ? accent : C.muted,
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: "pointer",
+            }}
+          >
+            🏋️ Üben
+          </button>
+        </div>
+
+        {mode === 'learn' && (
+          <>
+            <div
               style={{
-                width: 20,
-                height: 20,
-                borderRadius: "50%",
-                fontSize: 10,
-                fontWeight: 700,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: areaDone[i] ? C.green : i === idx ? accent : C.panel2,
-                color: areaDone[i] || i === idx ? "#1A1200" : C.muted,
-                flexShrink: 0,
+                height: 6,
+                background: C.panel2,
+                borderRadius: 999,
+                marginBottom: 18,
+                overflow: "hidden",
               }}
             >
-              {areaDone[i] ? "✓" : m.num}
-            </span>
-            <span style={{ fontSize: 12.5, lineHeight: 1.3 }}>{m.title}</span>
-          </button>
-        ))}
+              <div
+                style={{
+                  width: `${progress}%`,
+                  height: "100%",
+                  background: accent,
+                  transition: "width .3s",
+                }}
+              />
+            </div>
+
+            {modules.map((m, i) => (
+              <button
+                key={m.num}
+                onClick={() => goTo(i)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  width: "100%",
+                  textAlign: "left",
+                  background: i === idx ? C.panel2 : "transparent",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "8px 10px",
+                  marginBottom: 2,
+                  cursor: "pointer",
+                  color: i === idx ? C.text : C.muted,
+                }}
+              >
+                <span
+                  style={{
+                    width: 20,
+                    height: 20,
+                    borderRadius: "50%",
+                    fontSize: 10,
+                    fontWeight: 700,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: areaDone[i] ? C.green : i === idx ? accent : C.panel2,
+                    color: areaDone[i] || i === idx ? "#1A1200" : C.muted,
+                    flexShrink: 0,
+                  }}
+                >
+                  {areaDone[i] ? "✓" : m.num}
+                </span>
+                <span style={{ fontSize: 12.5, lineHeight: 1.3 }}>{m.title}</span>
+              </button>
+            ))}
+          </>
+        )}
+
+        {mode === 'practice' && (
+          <>
+            <div
+              style={{
+                height: 6,
+                background: C.panel2,
+                borderRadius: 999,
+                marginBottom: 18,
+                overflow: "hidden",
+              }}
+            >
+              <div
+                style={{
+                  width: `${totalPracticeAll ? Math.round((totalPracticeDone / totalPracticeAll) * 100) : 0}%`,
+                  height: "100%",
+                  background: accent,
+                  transition: "width .3s",
+                }}
+              />
+            </div>
+
+            {(['diagram', 'case', 'term'] as ExerciseKind[]).map((kind) => {
+              const info = EXERCISE_INFO[kind];
+              const items = listFor(area, kind);
+              const doneList = doneListFor(kind);
+              const active =
+                practiceView.kind === kind ||
+                (practiceView.kind === 'levelSelect' && practiceView.exercise === kind) ||
+                (practiceView.kind === 'done' && practiceView.exercise === kind);
+              return (
+                <button
+                  key={kind}
+                  onClick={() => setPracticeView({ kind: 'levelSelect', exercise: kind })}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    width: "100%",
+                    textAlign: "left",
+                    background: active ? C.panel2 : "transparent",
+                    border: "none",
+                    borderRadius: 8,
+                    padding: "10px",
+                    marginBottom: 4,
+                    cursor: "pointer",
+                    color: active ? C.text : C.muted,
+                  }}
+                >
+                  <span style={{ fontSize: 18 }}>{info.icon}</span>
+                  <span style={{ fontSize: 12.5, lineHeight: 1.3, flex: 1 }}>{info.title}</span>
+                  <span style={{ fontSize: 11, color: C.muted }}>
+                    {doneList.length}/{items.length}
+                  </span>
+                </button>
+              );
+            })}
+          </>
+        )}
       </aside>
 
       {/* MAIN */}
       <main style={{ flex: 1, padding: "32px 40px", maxWidth: 820 }}>
-        <div style={{ marginBottom: 6 }}>
-          <Chip color={accent}>{mod.category}</Chip>
-          <span style={{ color: C.muted, fontSize: 12, marginLeft: 10 }}>
-            Themenblock {mod.num} von {total}
-          </span>
-        </div>
-        <h1
-          style={{
-            fontFamily: displayFont,
-            fontSize: 30,
-            margin: "6px 0 20px",
-          }}
-        >
-          {mod.title}
-        </h1>
+        {mode === 'learn' && (
+          <>
+            <div style={{ marginBottom: 6 }}>
+              <Chip color={accent}>{mod.category}</Chip>
+              <span style={{ color: C.muted, fontSize: 12, marginLeft: 10 }}>
+                Themenblock {mod.num} von {total}
+              </span>
+            </div>
+            <h1
+              style={{
+                fontFamily: displayFont,
+                fontSize: 30,
+                margin: "6px 0 20px",
+              }}
+            >
+              {mod.title}
+            </h1>
 
-        {mod.content}
+            {mod.content}
 
-        {/* PRÜF-MODUS */}
-        <div
-          style={{
-            marginTop: 26,
-            background: C.panel,
-            border: `1px solid ${C.teal}55`,
-            borderRadius: 14,
-            padding: "20px 22px",
-          }}
-        >
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: 1,
-              textTransform: "uppercase",
-              color: C.teal,
-              marginBottom: 12,
-            }}
-          >
-            ✎ Prüf-Modus
-          </div>
-          <Quiz
-            q={mod.quiz}
-            qKey={`${area}-q${idx}`}
-            state={quizState}
-            setState={setQuizState}
-          />
-        </div>
+            {/* PRÜF-MODUS */}
+            <div
+              style={{
+                marginTop: 26,
+                background: C.panel,
+                border: `1px solid ${C.teal}55`,
+                borderRadius: 14,
+                padding: "20px 22px",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: 1,
+                  textTransform: "uppercase",
+                  color: C.teal,
+                  marginBottom: 12,
+                }}
+              >
+                ✎ Prüf-Modus
+              </div>
+              <Quiz
+                q={mod.quiz}
+                qKey={`${area}-q${idx}`}
+                state={quizState}
+                setState={setQuizState}
+              />
+            </div>
 
-        {/* NAV */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginTop: 28,
-            paddingBottom: 40,
-          }}
-        >
-          <button
-            onClick={() => goTo(idx - 1)}
-            disabled={idx === 0}
-            style={{
-              padding: "10px 18px",
-              borderRadius: 8,
-              border: `1px solid ${C.border}`,
-              background: "transparent",
-              color: idx === 0 ? C.muted : C.text,
-              cursor: idx === 0 ? "default" : "pointer",
-              opacity: idx === 0 ? 0.4 : 1,
-            }}
-          >
-            ← Zurück
-          </button>
-          <button
-            onClick={markDoneAndNext}
-            disabled={idx === total - 1 && areaDone[idx]}
-            style={{
-              padding: "10px 20px",
-              borderRadius: 8,
-              border: "none",
-              background: accent,
-              color: "#1A1200",
-              fontWeight: 700,
-              cursor: "pointer",
-            }}
-          >
-            {idx === total - 1 ? "Abschließen ✓" : "Als gelernt markieren → weiter"}
-          </button>
-        </div>
+            {/* NAV */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginTop: 28,
+                paddingBottom: 40,
+              }}
+            >
+              <button
+                onClick={() => goTo(idx - 1)}
+                disabled={idx === 0}
+                style={{
+                  padding: "10px 18px",
+                  borderRadius: 8,
+                  border: `1px solid ${C.border}`,
+                  background: "transparent",
+                  color: idx === 0 ? C.muted : C.text,
+                  cursor: idx === 0 ? "default" : "pointer",
+                  opacity: idx === 0 ? 0.4 : 1,
+                }}
+              >
+                ← Zurück
+              </button>
+              <button
+                onClick={markDoneAndNext}
+                disabled={idx === total - 1 && areaDone[idx]}
+                style={{
+                  padding: "10px 20px",
+                  borderRadius: 8,
+                  border: "none",
+                  background: accent,
+                  color: "#1A1200",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              >
+                {idx === total - 1 ? "Abschließen ✓" : "Als gelernt markieren → weiter"}
+              </button>
+            </div>
+          </>
+        )}
+
+        {mode === 'practice' && (
+          <>
+            {!done.practiceTutorialSeen && (
+              <StrategyTutorial onDone={() => setDone({ ...done, practiceTutorialSeen: true })} />
+            )}
+
+            {practiceView.kind === 'menu' && (
+              <PracticeMenu area={area} accent={accent} doneListFor={doneListFor} onPick={(kind) => setPracticeView({ kind: 'levelSelect', exercise: kind })} />
+            )}
+
+            {practiceView.kind === 'levelSelect' && (
+              <PracticeLevelSelect
+                area={area}
+                accent={accent}
+                exercise={practiceView.exercise}
+                doneIds={doneListFor(practiceView.exercise)}
+                onPick={(difficulty) => setPracticeView({ kind: practiceView.exercise, difficulty, index: 0 })}
+                onBack={practiceGoBack}
+              />
+            )}
+
+            {(practiceView.kind === 'diagram' || practiceView.kind === 'case' || practiceView.kind === 'term') && (
+              <PracticeRunner
+                area={area}
+                accent={accent}
+                view={practiceView}
+                onAdvance={() => advancePractice(practiceView.kind, practiceView.difficulty)}
+                onBack={practiceGoBack}
+              />
+            )}
+
+            {practiceView.kind === 'done' && (
+              <PracticeDoneView
+                area={area}
+                accent={accent}
+                exercise={practiceView.exercise}
+                difficulty={practiceView.difficulty}
+                onRestart={() => setPracticeView({ kind: practiceView.exercise, difficulty: practiceView.difficulty, index: 0 })}
+                onNextLevel={(difficulty) => setPracticeView({ kind: practiceView.exercise, difficulty, index: 0 })}
+                onLevelSelect={() => setPracticeView({ kind: 'levelSelect', exercise: practiceView.exercise })}
+              />
+            )}
+          </>
+        )}
       </main>
+    </div>
+  );
+}
+
+function PracticeMenu({
+  area,
+  accent,
+  doneListFor,
+  onPick,
+}: {
+  area: AreaKey;
+  accent: string;
+  doneListFor: (kind: ExerciseKind) => string[];
+  onPick: (kind: ExerciseKind) => void;
+}) {
+  return (
+    <div>
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", color: accent, marginBottom: 6 }}>
+          Üben
+        </div>
+        <h1 style={{ fontFamily: displayFont, fontSize: 30, margin: "0 0 8px" }}>Wähle eine Übungsart</h1>
+        <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.6 }}>
+          Statt nur zu lesen, wendest du hier die Modelle aktiv an — von Anfänger bis Profi.
+        </p>
+      </div>
+      <div style={{ display: "grid", gap: 14 }}>
+        {(['diagram', 'case', 'term'] as ExerciseKind[]).map((kind) => {
+          const info = EXERCISE_INFO[kind];
+          const items = listFor(area, kind);
+          const doneList = doneListFor(kind);
+          return (
+            <button
+              key={kind}
+              onClick={() => onPick(kind)}
+              style={{
+                textAlign: "left",
+                background: C.panel,
+                border: `1px solid ${C.border}`,
+                borderLeft: `4px solid ${accent}`,
+                borderRadius: 14,
+                padding: "20px 22px",
+                cursor: "pointer",
+                color: C.text,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                <span style={{ fontSize: 28 }}>{info.icon}</span>
+                <Chip color={accent}>
+                  {doneList.length}/{items.length}
+                </Chip>
+              </div>
+              <div style={{ fontFamily: displayFont, fontSize: 19, fontWeight: 700, marginBottom: 4 }}>{info.title}</div>
+              <div style={{ color: C.muted, fontSize: 13.5, lineHeight: 1.5 }}>{info.desc}</div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function PracticeLevelSelect({
+  area,
+  accent,
+  exercise,
+  doneIds,
+  onPick,
+  onBack,
+}: {
+  area: AreaKey;
+  accent: string;
+  exercise: ExerciseKind;
+  doneIds: string[];
+  onPick: (difficulty: Difficulty) => void;
+  onBack: () => void;
+}) {
+  const info = EXERCISE_INFO[exercise];
+  return (
+    <div>
+      <button onClick={onBack} style={{ background: "transparent", border: "none", color: C.muted, fontSize: 12, cursor: "pointer", marginBottom: 14, padding: 0 }}>
+        ← Übungsmenü
+      </button>
+      <h1 style={{ fontFamily: displayFont, fontSize: 26, margin: "0 0 6px" }}>
+        {info.icon} {info.title}
+      </h1>
+      <p style={{ color: C.muted, fontSize: 13.5, marginBottom: 18 }}>Wähle deine Schwierigkeitsstufe.</p>
+      <div style={{ display: "grid", gap: 12 }}>
+        {DIFFICULTY_ORDER.map((difficulty) => {
+          const items = listForLevel(area, exercise, difficulty);
+          if (items.length === 0) return null;
+          const doneCount = items.filter((it) => doneIds.includes(it.id)).length;
+          const d = DIFFICULTY_INFO[difficulty];
+          return (
+            <button
+              key={difficulty}
+              onClick={() => onPick(difficulty)}
+              style={{
+                textAlign: "left",
+                background: C.panel,
+                border: `1px solid ${C.border}`,
+                borderRadius: 12,
+                padding: "16px 20px",
+                cursor: "pointer",
+                color: C.text,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <span style={{ fontFamily: displayFont, fontSize: 17, fontWeight: 700 }}>{d.label}</span>
+                <Chip color={accent}>
+                  {doneCount}/{items.length}
+                </Chip>
+              </div>
+              <p style={{ color: C.muted, fontSize: 13, marginTop: 4 }}>{d.desc}</p>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function PracticeRunner({
+  area,
+  accent,
+  view,
+  onAdvance,
+  onBack,
+}: {
+  area: AreaKey;
+  accent: string;
+  view: { kind: ExerciseKind; difficulty: Difficulty; index: number };
+  onAdvance: () => void;
+  onBack: () => void;
+}) {
+  const items = listForLevel(area, view.kind, view.difficulty);
+  const info = EXERCISE_INFO[view.kind];
+  const d = DIFFICULTY_INFO[view.difficulty];
+  const item = items[view.index];
+
+  return (
+    <div>
+      <button onClick={onBack} style={{ background: "transparent", border: "none", color: C.muted, fontSize: 12, cursor: "pointer", marginBottom: 10, padding: 0 }}>
+        ← Schwierigkeit wählen
+      </button>
+      <p style={{ fontSize: 11, fontWeight: 700, color: C.muted, marginBottom: 8 }}>
+        {info.icon} {info.title.toUpperCase()} · {d.label} · {view.index + 1}/{items.length}
+      </p>
+      <div style={{ height: 6, background: C.panel2, borderRadius: 999, marginBottom: 20, overflow: "hidden" }}>
+        <div style={{ width: `${((view.index + 1) / items.length) * 100}%`, height: "100%", background: accent }} />
+      </div>
+
+      {view.kind === 'diagram' && (
+        <div key={item.id} className="card p-5">
+          <h2 className="text-ink font-bold text-lg mb-1">{item.title}</h2>
+          <p className="text-sub text-[13px] mb-4">{(item as DiagramDef).subtitle}</p>
+          <DiagramLabeling diagram={item as DiagramDef} onComplete={onAdvance} />
+        </div>
+      )}
+      {view.kind === 'case' && (
+        <div key={item.id} className="card p-5">
+          <h2 className="text-ink font-bold text-lg mb-3">{item.title}</h2>
+          <CaseStudyPriority caseStudy={item as CaseStudy} onComplete={onAdvance} />
+        </div>
+      )}
+      {view.kind === 'term' && (
+        <div key={item.id} className="card p-5">
+          <h2 className="text-ink font-bold text-lg mb-3">{item.title}</h2>
+          <TermMatch set={item as TermMatchSet} onComplete={onAdvance} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PracticeDoneView({
+  area,
+  accent,
+  exercise,
+  difficulty,
+  onRestart,
+  onNextLevel,
+  onLevelSelect,
+}: {
+  area: AreaKey;
+  accent: string;
+  exercise: ExerciseKind;
+  difficulty: Difficulty;
+  onRestart: () => void;
+  onNextLevel: (difficulty: Difficulty) => void;
+  onLevelSelect: () => void;
+}) {
+  const info = EXERCISE_INFO[exercise];
+  const d = DIFFICULTY_INFO[difficulty];
+  const nextDifficulty = DIFFICULTY_ORDER[DIFFICULTY_ORDER.indexOf(difficulty) + 1];
+  const hasNext = Boolean(nextDifficulty && listForLevel(area, exercise, nextDifficulty).length > 0);
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 14,
+        padding: 28,
+        borderRadius: 16,
+        textAlign: "center",
+        background: `linear-gradient(135deg, ${accent}22, transparent)`,
+        border: `1px solid ${accent}55`,
+      }}
+    >
+      <span style={{ fontSize: 44 }}>🏆</span>
+      <h2 style={{ fontFamily: displayFont, fontSize: 22, fontWeight: 700, margin: 0 }}>
+        {info.title} — {d.label} abgeschlossen!
+      </h2>
+      <p style={{ color: "#D3DBE4", fontSize: 14, maxWidth: 420, lineHeight: 1.6 }}>
+        Du hast alle Übungen dieser Stufe gemeistert. Wiederhole sie jederzeit oder steig eine Stufe höher ein.
+      </p>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
+        {hasNext && (
+          <button
+            onClick={() => onNextLevel(nextDifficulty)}
+            style={{ padding: "10px 20px", borderRadius: 8, border: "none", background: accent, color: "#1A1200", fontWeight: 700, cursor: "pointer" }}
+          >
+            {DIFFICULTY_INFO[nextDifficulty].label} ausprobieren →
+          </button>
+        )}
+        <button
+          onClick={onRestart}
+          style={{ padding: "10px 20px", borderRadius: 8, border: `1px solid ${C.border}`, background: "transparent", color: C.text, cursor: "pointer" }}
+        >
+          Nochmal üben 🔁
+        </button>
+        <button
+          onClick={onLevelSelect}
+          style={{ padding: "10px 20px", borderRadius: 8, border: `1px solid ${C.border}`, background: "transparent", color: C.text, cursor: "pointer" }}
+        >
+          ← Schwierigkeit wählen
+        </button>
+      </div>
     </div>
   );
 }
