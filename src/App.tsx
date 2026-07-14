@@ -12,6 +12,7 @@ import { LectureMenu, LectureFlow } from './modules/lectures';
 import { RasterTrainer } from './modules/lectures/RasterTrainer';
 import { StrategyHub } from './modules/strategy';
 import { TrueFalseTrainer } from './modules/truefalse';
+import { EnglishTrainer } from './modules/english';
 
 function RouteOutlet({ route }: { route: Route }) {
   const nav = useNavigator();
@@ -51,6 +52,8 @@ function RouteOutlet({ route }: { route: Route }) {
       return <StrategyHub />;
     case 'trueFalse':
       return <TrueFalseTrainer />;
+    case 'englisch':
+      return <EnglishTrainer />;
   }
 }
 
