@@ -41,6 +41,16 @@ export function MainMenu() {
       color: 'var(--strategy)',
       onOpen: () => nav.push({ name: 'strategyHub' }),
     },
+    {
+      icon: '🇬🇧',
+      title: 'Englisch',
+      subtitle:
+        'Business-English-Vokabeltrainer mit Karteikarten und Spaced Repetition: 1063 Vokabeln von A1 bis C1, die App merkt sich deinen Lernfortschritt pro Wort.',
+      meta: '5 Niveaus · Karteikarten',
+      actionLabel: 'Vokabeln lernen',
+      color: 'var(--english)',
+      onOpen: () => nav.push({ name: 'englisch' }),
+    },
   ];
 
   return (
@@ -64,8 +74,9 @@ export function MainMenu() {
             Wähle deinen Lernbereich.
           </h1>
           <p className="text-sub text-[15.5px] sm:text-base mt-4 max-w-xl leading-relaxed">
-            Zwei eigenständige Bereiche, ein Zugang: Wirtschaftsinformatik mit acht interaktiven
-            Lernprogrammen und Strategie & Führung mit Themenblöcken und Prüf-Modus-Quiz zu jedem Thema.
+            Drei eigenständige Bereiche, ein Zugang: Wirtschaftsinformatik mit acht interaktiven
+            Lernprogrammen, Strategie & Führung mit Themenblöcken und Prüf-Modus-Quiz zu jedem Thema, und
+            Englisch mit einem Business-English-Vokabeltrainer.
           </p>
         </section>
 

@@ -20,7 +20,8 @@ export type Route =
   | { name: 'lectureFlow'; chapterId: string }
   | { name: 'rasterTrainer' }
   | { name: 'strategyHub' }
-  | { name: 'trueFalse' };
+  | { name: 'trueFalse' }
+  | { name: 'englisch' };
 
 interface NavigatorState {
   path: Route[];
