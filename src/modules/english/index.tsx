@@ -41,7 +41,18 @@ function shuffled<T>(arr: T[]): T[] {
   return copy;
 }
 
+// Richtung pro Karte zufällig: mal wird das englische Wort gezeigt und die
+// deutsche Übersetzung gesucht, mal umgekehrt — trainiert Erkennen UND
+// Produzieren in beide Richtungen statt nur stures Wiedererkennen.
 function vocabToFace(v: VocabEntry): { front: CardFace; back: CardFace; id: string } {
+  const askGerman = Math.random() < 0.5;
+  if (askGerman) {
+    return {
+      id: v.id,
+      front: { eyebrow: `Level ${v.level} · Deutsch`, text: v.de, hint: 'Tippen, um die englische Übersetzung zu sehen' },
+      back: { eyebrow: 'Englisch', text: v.en, hint: 'Tippen, um zurückzudrehen' },
+    };
+  }
   return {
     id: v.id,
     front: { eyebrow: `Level ${v.level} · Englisch`, text: v.en, hint: 'Tippen, um die Übersetzung zu sehen' },
