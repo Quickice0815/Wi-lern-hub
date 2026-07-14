@@ -35,8 +35,8 @@ export function MainMenu() {
       icon: '🧩',
       title: 'Strategie & Führung',
       subtitle:
-        'Diagramme wie BCG-Matrix, Five-Forces und das Reifegradmodell der Führung selbst beschriften, Fallstudien per Drag & Drop priorisieren und Fachbegriffe im Lückentext einsetzen.',
-      meta: 'Onboarding inklusive',
+        'Lerninhalte zu Führung (Kommunikation, Führungsstile, Change Management) und Strategie (Frameworks & Case-Study-Methodik) mit Prüf-Modus-Quiz zu jedem Themenblock.',
+      meta: `${13 + 9} Themenblöcke`,
       actionLabel: 'Öffnen',
       color: 'var(--strategy)',
       onOpen: () => nav.push({ name: 'strategyHub' }),
@@ -65,7 +65,7 @@ export function MainMenu() {
           </h1>
           <p className="text-sub text-[15.5px] sm:text-base mt-4 max-w-xl leading-relaxed">
             Zwei eigenständige Bereiche, ein Zugang: Wirtschaftsinformatik mit acht interaktiven
-            Lernprogrammen und Strategie & Führung mit Diagrammen, Fallstudien und Lückentext-Matching.
+            Lernprogrammen und Strategie & Führung mit Themenblöcken und Prüf-Modus-Quiz zu jedem Thema.
           </p>
         </section>
 
