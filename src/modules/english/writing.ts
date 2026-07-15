@@ -1,3 +1,12 @@
+export interface EmailTask {
+  id: string;
+  scenario: string;
+  instruction: string;
+  bullets: string[];
+  wordCount?: string;
+  modelEmail: string;
+}
+
 export interface WritingExample {
   id: string;
   title: string;
@@ -6,27 +15,142 @@ export interface WritingExample {
 }
 
 // ============================================================
-// SCHREIBTRAINING — Klausur-Format: die deutschen Informationen
-// sind vorgegeben, daraus soll die englische E-Mail bzw. der
-// englische Report entstehen. Beim Üben bleibt die deutsche
-// Vorlage sichtbar, die englische Musterlösung wird erst nach
-// einem eigenen Schreibversuch aufgedeckt.
+// SCHREIBTRAINING — Klausur-Format.
+//
+// E-Mails: die Klausur gibt eine kurze deutsche Situation plus
+// 3-4 Stichpunkte vor, was die E-Mail enthalten muss (kein
+// fertiger deutscher Text). Genau dieses Format wird hier geübt:
+// Situation + Stichpunkte + Wortzahl-Vorgabe bleiben sichtbar,
+// die englische Musterlösung wird erst nach einem eigenen
+// Schreibversuch aufgedeckt.
+//
+// Reports: hier liegen die Informationen (z. B. aus Diagrammen)
+// bereits als deutscher Fließtext vor, aus dem der englische
+// Report entstehen soll — daher bleibt dieses Format unverändert.
 // ============================================================
 
-const EMAIL_TEXTS: Omit<WritingExample, 'id'>[] = [
+const EMAIL_TASKS: Omit<EmailTask, 'id'>[] = [
   {
-    title: 'Kostenvoranschlag anfragen',
-    de: `Hallo Frau Smith,
+    scenario:
+      'Sie arbeiten als freiberufliche(r) Unternehmensberater:in. Sie sind von einem lokalen Unternehmen gebeten worden, für das Management der Firma eine Schulung durchzuführen zu dem Thema: „Erfolgreiches Gestalten von Personalgesprächen". Der Schulungstermin ist für Februar 2024 geplant.',
+    instruction: 'Schreiben Sie eine E-Mail an Ihre Kontaktperson:',
+    bullets: [
+      'Bekunden Sie Ihr Interesse an der Durchführung des Seminars;',
+      'teilen Sie mit, warum es Ihnen nicht möglich ist, das Seminar in der vorgeschlagenen Zeit zu halten;',
+      'nennen Sie einen Alternativtermin.',
+    ],
+    wordCount: '40-50 Wörter',
+    modelEmail: `Hello Ms Taylor,
 
-ich schreibe bezüglich der Dienstleistungen, die wir besprochen haben. Könnten Sie mir bitte bis zum 18. März einen Kostenvoranschlag schicken, einschließlich Lieferzeit und Zahlungsbedingungen? Falls Sie weitere Informationen benötigen, geben Sie mir bitte Bescheid; ich sende sie umgehend.
+Thank you for asking me to run the seminar "Successfully Conducting Staff Appraisals" for your management team. I would be delighted to deliver this training.
 
-Vielen Dank für Ihre Unterstützung.
+Unfortunately, I am unable to hold the seminar in February, as I already have a prior commitment. However, I could deliver it in March instead.
 
-Mit freundlichen Grüßen
+Kind regards,
 Steffen`,
-    en: `Hello Ms Smith,
+  },
+  {
+    scenario:
+      'Sie haben bereits ein Hotel für eine Geschäftsreise gebucht. Ein weiterer Kollege wird an der Reise teilnehmen, und Ihr Team benötigt außerdem einen großen Besprechungsraum für eine Konferenz.',
+    instruction: 'Schreiben Sie eine E-Mail an das Hotel:',
+    bullets: [
+      'erklären Sie, warum Sie schreiben;',
+      'bitten Sie um einen großen Besprechungsraum;',
+      'teilen Sie mit, dass ein weiterer Kollege kommt und ein zusätzliches Zimmer benötigt wird;',
+      'bitten Sie um eine Bestätigung der Änderungen.',
+    ],
+    wordCount: 'etwa 60 Wörter',
+    modelEmail: `Hello,
 
-I'm writing regarding the services we discussed. Could you please send an estimate of your costs by 18 March, including delivery time and payment terms? If you require any additional information, please let me know and I will provide it immediately.
+I'm writing regarding our booking for 14-16 March under the name Steffen Friedrich. I would like to make a few changes to the reservation.
+
+Could you please provide a large meeting room for a conference during our stay? In addition, a colleague will be joining the trip, so we will need one additional room.
+
+Could you please confirm these changes at your earliest convenience?
+
+Kind regards,
+Steffen`,
+  },
+  {
+    scenario: 'Sie haben nächste Woche ein Meeting mit einem Kunden.',
+    instruction: 'Schreiben Sie eine E-Mail.',
+    bullets: ['entschuldigen Sie sich', 'nennen Sie den Grund', 'schlagen Sie einen neuen Termin vor'],
+    modelEmail: `Hello Mr Brown,
+
+I'm afraid I need to reschedule our meeting next week. Unfortunately, I have a scheduling conflict due to an urgent client matter that requires my attention.
+
+Would it be possible to meet on Thursday instead? Please let me know if that works for you.
+
+Kind regards,
+Steffen`,
+  },
+  {
+    scenario: 'Ihre Firma möchte neue Büromöbel kaufen.',
+    instruction: 'Schreiben Sie eine E-Mail.',
+    bullets: ['erklären Sie, was Sie benötigen', 'bitten Sie um ein Angebot', 'fragen Sie nach Lieferzeit'],
+    modelEmail: `Hello,
+
+I'm writing on behalf of my company, as we are planning to purchase new office furniture, including desks, chairs and storage units for around 20 employees.
+
+Could you please send us a quote for these items? I would also appreciate it if you could let me know the expected delivery time.
+
+Kind regards,
+Steffen`,
+  },
+  {
+    scenario: 'Sie haben ein Hotelzimmer gebucht.',
+    instruction: 'Schreiben Sie eine E-Mail.',
+    bullets: ['bestätigen Sie die Buchung', 'fragen Sie nach einem frühen Check-in', 'erkundigen Sie sich nach Parkplätzen'],
+    modelEmail: `Hello,
+
+I would like to confirm my booking for 5-7 April under the reference SF-2201.
+
+As my flight arrives early in the morning, would it be possible to check in earlier than the standard time? I would also like to ask whether parking is available on site.
+
+Thank you for your help.
+
+Kind regards,
+Steffen`,
+  },
+  {
+    scenario: 'Sie waren in einem Hotel.',
+    instruction: 'Schreiben Sie eine E-Mail.',
+    bullets: ['beschweren Sie sich', 'nennen Sie zwei Probleme', 'bitten Sie um eine Lösung'],
+    modelEmail: `Hello,
+
+I recently stayed at your hotel from 2 to 4 May, and unfortunately I was not satisfied with my stay.
+
+Firstly, the room was not properly cleaned on arrival. Secondly, the air conditioning did not work throughout my stay, despite reporting it to reception.
+
+Could you please let me know how you intend to resolve this matter?
+
+Kind regards,
+Steffen`,
+  },
+  {
+    scenario: 'Sie möchten sich für ein Praktikum bewerben.',
+    instruction: 'Schreiben Sie eine E-Mail.',
+    bullets: ['sagen Sie, warum Sie sich bewerben', 'nennen Sie Ihre Qualifikationen', 'bitten Sie um ein Vorstellungsgespräch'],
+    modelEmail: `Hello,
+
+I am writing to apply for the internship position in your marketing department, as advertised on your website. I am currently studying business informatics and am very interested in gaining practical experience in your company.
+
+I have strong skills in data analysis and have completed several relevant projects during my studies.
+
+Would it be possible to arrange an interview at a convenient time?
+
+Kind regards,
+Steffen`,
+  },
+  {
+    scenario: 'Sie warten auf eine Bestellung.',
+    instruction: 'Schreiben Sie eine E-Mail.',
+    bullets: ['sagen Sie, welche Bestellung gemeint ist', 'erklären Sie das Problem', 'bitten Sie um Informationen'],
+    modelEmail: `Hello,
+
+I'm writing regarding my order #4471, placed on 3 June. According to the confirmation, it should have arrived by now, but I have not yet received it.
+
+Could you please check the status of my order and let me know when I can expect delivery?
 
 Thanks for your help.
 
@@ -34,69 +158,35 @@ Kind regards,
 Steffen`,
   },
   {
-    title: 'Korrigierte Rechnung senden',
-    de: `Hallo Herr Brown,
+    scenario: 'Sie wurden zu einer Firmenveranstaltung eingeladen.',
+    instruction: 'Schreiben Sie eine E-Mail.',
+    bullets: ['bedanken Sie sich', 'sagen Sie ab', 'wünschen Sie eine erfolgreiche Veranstaltung'],
+    modelEmail: `Hello,
 
-ich entschuldige mich für die falsche Rechnung, die ich gestern gesendet habe. Anbei finden Sie die korrigierte Version. Könnten Sie bitte bestätigen, dass Sie sie erhalten haben und dass der aktualisierte Betrag für Sie in Ordnung ist? Falls es Fragen gibt, kläre ich die Details gern.
+Thank you very much for inviting me to the company event on 20 June. I really appreciate the invitation.
 
-Vielen Dank im Voraus.
+Unfortunately, I am unable to attend due to a prior commitment on that day.
 
-Mit freundlichen Grüßen
-Steffen`,
-    en: `Hello Mr Brown,
-
-I do apologise for the incorrect invoice sent yesterday. Please find the corrected version attached. Could you please confirm that you have received it and that the updated amount is acceptable? If there are any questions, I would be happy to clarify the details.
-
-Thank you in advance.
+I wish you a very successful event.
 
 Kind regards,
 Steffen`,
   },
   {
-    title: 'Seminartermin verschieben',
-    de: `Hallo Frau Smith,
+    scenario:
+      'Sie arbeiten als Einkäufer:in in einem Unternehmen. Eine Lieferfirma hat angekündigt, Ihre Bestellung Anfang Mai 2024 zu liefern. Zu diesem Zeitpunkt kann Ihre Firma die Lieferung jedoch nicht annehmen.',
+    instruction: 'Schreiben Sie eine E-Mail an Ihre Kontaktperson:',
+    bullets: [
+      'bedanken Sie sich für die Information;',
+      'erklären Sie, warum die Lieferung nicht angenommen werden kann;',
+      'nennen Sie einen Alternativtermin für die Lieferung.',
+    ],
+    wordCount: '40-60 Wörter',
+    modelEmail: `Hello Mr Brown,
 
-ich schreibe bezüglich des Seminars „Effective Staff Appraisals“ am 18. März. Leider habe ich eine Überschneidung im Stundenplan und kann daher vormittags nicht teilnehmen. Wäre es möglich, meine Teilnahme auf einen Termin am Nachmittag zu verschieben oder einen Alternativtermin in der nächsten Woche anzubieten? Bitte geben Sie mir Bescheid, was möglich ist.
+Thank you for letting me know that our order is scheduled for delivery in early May. Unfortunately, we are unable to accept the delivery at that time, as our warehouse will be closed for renovation work.
 
-Mit freundlichen Grüßen
-Steffen`,
-    en: `Hello Ms Smith,
-
-I'm writing regarding the "Effective Staff Appraisals" seminar on 18 March. Unfortunately, I have a timetable conflict and I am therefore unable to attend in the morning. Would it be possible to move my participation to an afternoon session, or to an alternative date next week? Please let me know what is available.
-
-Kind regards,
-Steffen`,
-  },
-  {
-    title: 'Kursort bestätigen lassen',
-    de: `Hallo Frau Miller,
-
-vielen Dank für die Information zum Kurs. Ich habe zur Kenntnis genommen, dass der Veranstaltungsort aufgrund der hohen Nachfrage in eine größere Location verlegt wurde. Könnten Sie bitte die vollständige Adresse und die Startzeit bestätigen, damit ich meine Anreise entsprechend planen kann?
-
-Vielen Dank für Ihre Hilfe.
-
-Mit freundlichen Grüßen
-Steffen`,
-    en: `Hello Ms Miller,
-
-Thank you for the update regarding the course. I have noted that, due to high demand, the venue has been changed to a larger location. Could you please confirm the full address and the start time, so I can plan my travel accordingly?
-
-Thanks for your help.
-
-Kind regards,
-Steffen`,
-  },
-  {
-    title: 'Follow-up nach einem Meeting',
-    de: `Hallo Herr Brown,
-
-bezugnehmend auf unser Treffen Anfang dieser Woche finden Sie anbei die von Ihnen angeforderten Informationen. Könnten Sie bitte bestätigen, ob die vorgeschlagenen nächsten Schritte für Sie in Ordnung sind, und mir einen passenden Zeitpunkt für ein kurzes Folgegespräch nennen? Wenn Sie möchten, kann ich Ihnen auch meine Verfügbarkeit für nächste Woche senden.
-
-Mit freundlichen Grüßen
-Steffen`,
-    en: `Hello Mr Brown,
-
-Referring to our meeting earlier this week, please find attached the information you requested. Could you please confirm whether the proposed next steps are acceptable and advise on a suitable time for a short follow-up call? If you prefer, I can share my availability for next week.
+Would it be possible to deliver the order in the following week instead?
 
 Kind regards,
 Steffen`,
@@ -275,9 +365,9 @@ Recommendations
   },
 ];
 
-function build(prefix: string, items: Omit<WritingExample, 'id'>[]): WritingExample[] {
+function withIds<T extends object>(prefix: string, items: T[]): (T & { id: string })[] {
   return items.map((item, i) => ({ ...item, id: `${prefix}-${i + 1}` }));
 }
 
-export const EMAIL_EXAMPLES: WritingExample[] = build('email-ex', EMAIL_TEXTS);
-export const REPORT_EXAMPLES: WritingExample[] = build('report-ex', REPORT_TEXTS);
+export const EMAIL_EXAMPLES: EmailTask[] = withIds('email-ex', EMAIL_TASKS);
+export const REPORT_EXAMPLES: WritingExample[] = withIds('report-ex', REPORT_TEXTS);

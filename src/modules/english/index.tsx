@@ -4,10 +4,11 @@ import { useCloudProgress } from '../../lib/progress';
 import { BackBar, Card, PageShell, PrimaryButton, ProgressBar, SecondaryButton } from '../../components/ui';
 import { CEFR_LEVELS, VOCAB, type CefrLevel, type VocabEntry } from './data';
 import { EMAIL_PHRASES, REPORT_PHRASES, type PhraseEntry } from './phrases';
-import { EMAIL_EXAMPLES, REPORT_EXAMPLES, type WritingExample } from './writing';
+import { EMAIL_EXAMPLES, REPORT_EXAMPLES, type EmailTask, type WritingExample } from './writing';
 import { gradeCard, isDue, newCardState, previewIntervals, type CardState, type EnglishProgress, type Grade } from './srs';
 import { Flashcard, type CardFace } from './Flashcard';
 import { WritingCard } from './WritingCard';
+import { EmailTaskCard } from './EmailTaskCard';
 
 // ============================================================
 // ENGLISCH-VOKABELTRAINER — eigenständiger Bereich im Hauptmenü.
@@ -92,7 +93,7 @@ export function EnglishTrainer() {
   const [selection, setSelection] = useState<Selection | null>(null);
   const [activeKind, setActiveKind] = useState<ActiveKind>('flip');
   const [flipQueue, setFlipQueue] = useState<ReturnType<typeof vocabToFace>[]>([]);
-  const [writingQueue, setWritingQueue] = useState<WritingExample[]>([]);
+  const [writingQueue, setWritingQueue] = useState<(EmailTask | WritingExample)[]>([]);
   const [idx, setIdx] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [advancing, setAdvancing] = useState(false);
@@ -223,7 +224,7 @@ export function EnglishTrainer() {
       {phase === 'session' && !finished && activeKind === 'writing' && writingQueue[idx] && (
         <WritingSessionView
           item={writingQueue[idx]}
-          eyebrow={selection?.kind === 'writing' && selection.which === 'email' ? 'E-Mail schreiben' : 'Report schreiben'}
+          isEmail={selection?.kind === 'writing' && selection.which === 'email'}
           state={progress[writingQueue[idx].id]}
           revealed={revealed}
           onReveal={() => setRevealed(true)}
@@ -379,8 +380,9 @@ function LevelSelect({
         <h2 className="text-ink text-lg font-bold">Redemittel & Schreibtraining</h2>
         <p className="text-sub text-sm leading-relaxed">
           Klausurformat: Business-E-Mails und -Reports. Zuerst die Satzbausteine (Deutsch → Englisch), dann
-          ganze Beispiele — die deutsche Vorlage bleibt sichtbar, du schreibst deine eigene englische
-          Version und deckst danach die Musterlösung auf.
+          ganze Beispiele — E-Mail-Aufgaben bekommst du wie in der Klausur als kurze Situation mit
+          Stichpunkten und Wortzahl-Vorgabe, bei Reports liegen die Informationen als deutscher Fließtext
+          vor. Du schreibst deine eigene englische Version und deckst danach die Musterlösung auf.
         </p>
       </div>
 
@@ -399,7 +401,7 @@ function LevelSelect({
         />
         <DeckButton
           title="E-Mail schreiben üben"
-          subtitle="5 Klausur-Szenarien mit Musterlösung"
+          subtitle="10 Klausuraufgaben: Situation + Stichpunkte, wie in der Prüfung"
           stats={emailWritingStats}
           onClick={() => onSelectWriting('email')}
         />
@@ -477,7 +479,7 @@ function FlipSessionView({
 
 function WritingSessionView({
   item,
-  eyebrow,
+  isEmail,
   state,
   revealed,
   onReveal,
@@ -485,8 +487,8 @@ function WritingSessionView({
   index,
   total,
 }: {
-  item: WritingExample;
-  eyebrow: string;
+  item: EmailTask | WritingExample;
+  isEmail: boolean;
   state: CardState | undefined;
   revealed: boolean;
   onReveal: () => void;
@@ -497,7 +499,11 @@ function WritingSessionView({
   return (
     <div className="flex flex-col gap-4">
       <SessionProgress index={index} total={total} />
-      <WritingCard item={item} eyebrow={eyebrow} revealed={revealed} onReveal={onReveal} />
+      {isEmail ? (
+        <EmailTaskCard key={item.id} task={item as EmailTask} revealed={revealed} onReveal={onReveal} />
+      ) : (
+        <WritingCard key={item.id} item={item as WritingExample} eyebrow="Report schreiben" revealed={revealed} onReveal={onReveal} />
+      )}
       {revealed && <GradeRow state={state} onGrade={onGrade} />}
     </div>
   );
