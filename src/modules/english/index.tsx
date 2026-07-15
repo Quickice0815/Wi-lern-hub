@@ -4,11 +4,11 @@ import { useCloudProgress } from '../../lib/progress';
 import { BackBar, Card, PageShell, PrimaryButton, ProgressBar, SecondaryButton } from '../../components/ui';
 import { CEFR_LEVELS, VOCAB, type CefrLevel, type VocabEntry } from './data';
 import { EMAIL_PHRASES, REPORT_PHRASES, type PhraseEntry } from './phrases';
-import { EMAIL_EXAMPLES, REPORT_EXAMPLES, type EmailTask, type WritingExample } from './writing';
+import { EMAIL_EXAMPLES, REPORT_EXAMPLES, type EmailTask, type ReportTask } from './writing';
 import { gradeCard, isDue, newCardState, previewIntervals, type CardState, type EnglishProgress, type Grade } from './srs';
 import { Flashcard, type CardFace } from './Flashcard';
-import { WritingCard } from './WritingCard';
 import { EmailTaskCard } from './EmailTaskCard';
+import { ReportTaskCard } from './ReportTaskCard';
 
 // ============================================================
 // ENGLISCH-VOKABELTRAINER — eigenständiger Bereich im Hauptmenü.
@@ -93,7 +93,7 @@ export function EnglishTrainer() {
   const [selection, setSelection] = useState<Selection | null>(null);
   const [activeKind, setActiveKind] = useState<ActiveKind>('flip');
   const [flipQueue, setFlipQueue] = useState<ReturnType<typeof vocabToFace>[]>([]);
-  const [writingQueue, setWritingQueue] = useState<(EmailTask | WritingExample)[]>([]);
+  const [writingQueue, setWritingQueue] = useState<(EmailTask | ReportTask)[]>([]);
   const [idx, setIdx] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [advancing, setAdvancing] = useState(false);
@@ -381,8 +381,8 @@ function LevelSelect({
         <p className="text-sub text-sm leading-relaxed">
           Klausurformat: Business-E-Mails und -Reports. Zuerst die Satzbausteine (Deutsch → Englisch), dann
           ganze Beispiele — E-Mail-Aufgaben bekommst du wie in der Klausur als kurze Situation mit
-          Stichpunkten und Wortzahl-Vorgabe, bei Reports liegen die Informationen als deutscher Fließtext
-          vor. Du schreibst deine eigene englische Version und deckst danach die Musterlösung auf.
+          Stichpunkten und Wortzahl-Vorgabe, bei Reports als Diagramme mit Umfrageergebnissen. Du schreibst
+          deine eigene englische Version und deckst danach die Musterlösung auf.
         </p>
       </div>
 
@@ -407,7 +407,7 @@ function LevelSelect({
         />
         <DeckButton
           title="Report schreiben üben"
-          subtitle="5 Klausur-Reports mit Musterlösung"
+          subtitle="5 Klausuraufgaben mit Diagrammen, wie in der Prüfung"
           stats={reportWritingStats}
           onClick={() => onSelectWriting('report')}
         />
@@ -487,7 +487,7 @@ function WritingSessionView({
   index,
   total,
 }: {
-  item: EmailTask | WritingExample;
+  item: EmailTask | ReportTask;
   isEmail: boolean;
   state: CardState | undefined;
   revealed: boolean;
@@ -502,7 +502,7 @@ function WritingSessionView({
       {isEmail ? (
         <EmailTaskCard key={item.id} task={item as EmailTask} revealed={revealed} onReveal={onReveal} />
       ) : (
-        <WritingCard key={item.id} item={item as WritingExample} eyebrow="Report schreiben" revealed={revealed} onReveal={onReveal} />
+        <ReportTaskCard key={item.id} task={item as ReportTask} revealed={revealed} onReveal={onReveal} />
       )}
       {revealed && <GradeRow state={state} onGrade={onGrade} />}
     </div>

@@ -1,3 +1,5 @@
+import type { BarGroup, PieSlice } from './charts';
+
 export interface EmailTask {
   id: string;
   scenario: string;
@@ -7,11 +9,17 @@ export interface EmailTask {
   modelEmail: string;
 }
 
-export interface WritingExample {
+export type ReportChart =
+  | { type: 'pie'; title: string; data: PieSlice[] }
+  | { type: 'bar'; title: string; unit: string; oldLabel: string; newLabel: string; data: BarGroup[] };
+
+export interface ReportTask {
   id: string;
-  title: string;
-  en: string;
-  de: string;
+  scenario: string;
+  charts: ReportChart[];
+  hints: string[];
+  minWords: number;
+  modelReport: string;
 }
 
 // ============================================================
@@ -19,14 +27,15 @@ export interface WritingExample {
 //
 // E-Mails: die Klausur gibt eine kurze deutsche Situation plus
 // 3-4 Stichpunkte vor, was die E-Mail enthalten muss (kein
-// fertiger deutscher Text). Genau dieses Format wird hier geübt:
-// Situation + Stichpunkte + Wortzahl-Vorgabe bleiben sichtbar,
-// die englische Musterlösung wird erst nach einem eigenen
-// Schreibversuch aufgedeckt.
+// fertiger deutscher Text).
 //
-// Reports: hier liegen die Informationen (z. B. aus Diagrammen)
-// bereits als deutscher Fließtext vor, aus dem der englische
-// Report entstehen soll — daher bleibt dieses Format unverändert.
+// Reports: die Klausur gibt eine kurze deutsche Situation plus
+// ein oder mehrere Diagramme (Umfrageergebnisse) vor, aus denen
+// der englische Bericht entstehen soll — genau dieses Format wird
+// hier geübt. Zwei der Aufgaben (Büro-Modernisierung, Mitarbeiter-
+// bewertungssystem) sind 1:1 aus echtem Klausurmaterial übernommen;
+// die übrigen drei wurden mit plausiblen Umfragezahlen auf dasselbe
+// Format gebracht.
 // ============================================================
 
 const EMAIL_TASKS: Omit<EmailTask, 'id'>[] = [
@@ -193,34 +202,57 @@ Steffen`,
   },
 ];
 
-const REPORT_TEXTS: Omit<WritingExample, 'id'>[] = [
+const REPORT_TASKS: Omit<ReportTask, 'id'>[] = [
   {
-    title: 'Bericht zur Büro-Modernisierung',
-    de: `Einleitung
-Ziel dieses Berichts ist es, das Feedback der Mitarbeitenden zur Büro-Modernisierung zusammenzufassen und Empfehlungen für das Management abzuleiten. Die Ergebnisse basieren auf einer Umfrage zu Büroaufteilung, Umzugspräferenzen und Beleuchtung am Arbeitsplatz.
-
-Ergebnisse
-52% der Mitarbeitenden bevorzugen Großraumbüros, während 20% Einzelbüros vorziehen. Weitere 15% wünschen Einzelbüros für das Management, und 13% haben keine Präferenz. Das deutet darauf hin, dass Zusammenarbeit wichtig ist, aber ruhige Bereiche weiterhin benötigt werden.
-
-Beim Thema Umzug unterstützen 46% neue Räumlichkeiten in der gleichen Gegend, während 27% die Innenstadt bevorzugen. Nur 23% würden die bestehenden Büros modernisieren. Insgesamt spricht dies für einen Neustart mit möglichst wenig Störung der Pendelwege.
-
-Eine deutliche Mehrheit (90%) hält natürliches Licht für alle Arbeitsplätze für wichtig. Allerdings ist es möglicherweise nicht für jeden Schreibtisch umsetzbar.
-
-Empfehlungen
-1. Es wird empfohlen, in neue Räumlichkeiten in der gleichen Gegend umzuziehen, da diese Option die höchste Zustimmung hat und die Störung gering halten sollte.
-2. Zudem sollten Großraumbüros mit Ruhezonen und kleinen Besprechungsräumen umgesetzt werden, um Teamarbeit und Privatsphäre auszubalancieren.
-3. Da es eventuell nicht möglich ist, jedem Arbeitsplatz natürliches Licht zu bieten, sollte eine Alternative geprüft werden: tageslichtähnliche LED-Beleuchtung und eine Sitzordnung, die Fensterplätze für konzentrierte Tätigkeiten priorisiert.`,
-    en: `Report on Office Modernisation
+    scenario:
+      'Die Büros Ihres Unternehmens wurden vor dreißig Jahren gebaut und bedürfen dringend einer Modernisierung. Sie wurden gebeten, eine Mitarbeiterbefragung durchzuführen und einen Bericht für das Management zu verfassen. Schauen Sie sich die Diagramme unten an.',
+    charts: [
+      {
+        type: 'pie',
+        title: 'Welchen Büroplan präferieren Sie?',
+        data: [
+          { label: 'Großraumbüros', value: 52 },
+          { label: 'Einzelbüros', value: 20 },
+          { label: 'Einzelbüros fürs Management', value: 15 },
+          { label: 'Egal', value: 13 },
+        ],
+      },
+      {
+        type: 'pie',
+        title: 'Wie sollten wir die Büroräume verändern?',
+        data: [
+          { label: 'Modernisierung der bestehenden Räume', value: 23 },
+          { label: 'Neue Räumlichkeiten in der gleichen Gegend', value: 46 },
+          { label: 'Neue Räumlichkeiten im Stadtzentrum', value: 27 },
+          { label: 'Keine Meinung', value: 4 },
+        ],
+      },
+      {
+        type: 'pie',
+        title: 'Stört Sie das Arbeiten bei künstlichem Licht?',
+        data: [
+          { label: 'Alle Arbeitsplätze sollen natürliches Licht bekommen', value: 90 },
+          { label: 'Egal', value: 10 },
+        ],
+      },
+    ],
+    hints: [
+      'Begründen Sie den Wunsch des Managements nach Einzelbüros.',
+      'Empfehlen Sie eine der Umzugsoptionen und erklären Sie, warum.',
+      'Erklären Sie, warum nicht jeder Arbeitsplatz natürliches Licht bekommen kann, und schlagen Sie eine Alternative vor.',
+    ],
+    minWords: 180,
+    modelReport: `Report on Office Modernisation
 
 Introduction
-The purpose of this report is to summarise employee feedback on office modernisation and to make recommendations for management. The findings are based on survey results covering office layout, relocation preferences and workplace lighting.
+The purpose of this report is to summarise employee feedback on office modernisation and to make recommendations for management. The findings are based on a staff survey covering office layout, relocation preferences and workplace lighting.
 
 Findings
 The results show that 52% of employees prefer open-plan offices, while 20% favour single offices. A further 15% selected single offices for management, and the remaining 13% reported no preference. This suggests that collaboration is valued, but quiet areas are still needed.
 
-With regard to relocation, 46% support moving to new premises in the same area, while 27% prefer the city centre. Only 23% would modernise the existing offices. Overall, employees appear to favour a fresh start with limited disruption to commuting patterns.
+With regard to relocation, 46% support moving to new premises in the same area, while 27% prefer the city centre. Only 23% would modernise the existing offices, and the remaining 4% expressed no clear preference. Overall, employees appear to favour a fresh start with limited disruption to commuting patterns.
 
-A clear majority (90%) stated that natural light is essential for all workstations. However, it may not be possible to guarantee this for every desk.
+A clear majority (90%) stated that natural light is essential for all workstations, while the remaining 10% had no preference. However, it may not be possible to guarantee natural light for every desk.
 
 Recommendations
 1. It is recommended that the company relocates to new premises in the same area, because this has the strongest support and should minimise disruption.
@@ -228,24 +260,72 @@ Recommendations
 3. Finally, as it may not be possible to provide natural light for every workstation, an alternative should be considered: daylight LED solutions and a seating policy that prioritises window areas for tasks requiring high concentration.`,
   },
   {
-    title: 'Bericht zum Werbebudget für Turbodrinks',
-    de: `Einleitung
-Ziel dieses Berichts ist es, die vorliegenden Budgetzahlen zusammenzufassen und Empfehlungen für die Verteilung im nächsten Jahr zu geben. Betrachtet werden Werbung, Gratisproben und Messen.
+    scenario:
+      'Bei BrightFuture Marketing Ltd. wurde eine Mitarbeiter- und Führungskräftebefragung zum aktuellen Mitarbeiterbewertungssystem durchgeführt. Insgesamt nahmen 25 Mitarbeitende und 5 Führungskräfte teil. Sie wurden von Ihrer Vorgesetzten gebeten, die Ergebnisse zusammenzufassen und Verbesserungsmöglichkeiten zu identifizieren.',
+    charts: [
+      {
+        type: 'pie',
+        title: 'Mitarbeiter',
+        data: [
+          { label: 'Positive Einstellung', value: 68 },
+          { label: 'Beklagen fehlendes konstruktives Feedback', value: 24 },
+          { label: 'Keine Meinung', value: 8 },
+        ],
+      },
+      {
+        type: 'pie',
+        title: 'Beurteilung des Tools durch Management',
+        data: [
+          { label: 'Positives', value: 80 },
+          { label: 'Negatives', value: 20 },
+        ],
+      },
+    ],
+    hints: [
+      'Erklären Sie anhand von zwei Beispielen, warum die Mitarbeitenden das System positiv bzw. negativ wahrnehmen.',
+      'Erklären Sie, warum das Management das Tool überwiegend positiv bzw. teilweise negativ bewertet.',
+    ],
+    minWords: 180,
+    modelReport: `Report on Staff Appraisal Survey Results
 
-Ergebnisse
-Die Ausgaben für Anzeigen in Sportmagazinen stiegen von 300.000 AUD auf 450.000 AUD. Das deutet auf einen stärkeren Fokus auf Reichweite und Markenbekanntheit hin.
+Introduction
+The purpose of this report is to summarise the results of a survey on the current staff appraisal system at BrightFuture Marketing Ltd. In total, 25 employees and 5 managers took part, with the aim of identifying possible improvements.
 
-Die Ausgaben für Gratisproben bei Sportevents erhöhten sich deutlich von 50.000 AUD auf 200.000 AUD. Das spricht für eine Strategie, die auf Produkttests und direkte Kundenerfahrung setzt.
+Findings – Employees
+The results show that 68% of employees have a positive attitude towards the appraisal system, for example because they feel it gives them a clear overview of their performance and helps them plan their development. However, 24% complain about a lack of constructive feedback, saying that comments from appraisers are often too general to be genuinely useful. The remaining 8% reported no clear opinion.
 
-Im Gegensatz dazu blieben die Messeausgaben stabil bei 100.000 AUD, was darauf hindeutet, dass dieser Kanal gehalten, aber nicht ausgebaut wird.
+Findings – Management
+With regard to management, a clear majority (80%) rated the tool positively, highlighting its usefulness for tracking team performance and identifying training needs early. In contrast, 20% viewed it negatively, mainly due to the amount of time required to complete each appraisal properly.
 
-Insgesamt stieg das Gesamtbudget von 450.000 AUD auf 750.000 AUD. Die Prognose für nächstes Jahr liegt bei etwa 800.000 AUD, also weiterem Wachstum, jedoch langsamer.
-
-Empfehlungen
-1. Es wird empfohlen, Sampling weiterhin zu priorisieren, da es Produkttests und Wiederkäufe direkt unterstützt.
-2. Außerdem sollten die Werbeausgaben überprüft werden, um die relevanteste Zielgruppe besser zu erreichen und die Kosteneffizienz zu steigern.
-3. Da eine starke Erhöhung des Gesamtbudgets ggf. nicht möglich ist, sollte eine Alternative geprüft werden: einen kleinen Teil der Messeausgaben in messbare digitale Kampagnen umzuschichten.`,
-    en: `Report on the Promotional Budget for Turbodrinks
+Conclusion and Recommendations
+Overall, the appraisal system is well received, but there is clear room for improvement on both sides.
+1. It is recommended that appraisers receive training on giving more specific, constructive feedback, because this will directly address the main employee complaint.
+2. Furthermore, the appraisal process should be simplified in order to reduce the time burden reported by management.
+3. Finally, as it may not be possible to satisfy every employee, an alternative should be considered: introducing a short mid-year check-in to complement the annual appraisal.`,
+  },
+  {
+    scenario:
+      'Ihr Unternehmen hat das Werbebudget für Turbodrinks überarbeitet. Sie wurden gebeten, die Budgetzahlen zusammenzufassen und Empfehlungen für die Verteilung im nächsten Jahr zu geben. Schauen Sie sich das Diagramm unten an.',
+    charts: [
+      {
+        type: 'bar',
+        title: 'Werbebudget: Vorjahr vs. dieses Jahr (in AUD)',
+        unit: 'AUD ',
+        oldLabel: 'Vorjahr',
+        newLabel: 'Aktuell',
+        data: [
+          { label: 'Anzeigen (Sportmagazine)', oldValue: 300000, newValue: 450000 },
+          { label: 'Gratisproben (Sportevents)', oldValue: 50000, newValue: 200000 },
+          { label: 'Messen', oldValue: 100000, newValue: 100000 },
+        ],
+      },
+    ],
+    hints: [
+      'Erklären Sie, was der Anstieg bzw. die Stabilität bei jeder Kategorie über die Strategie des Unternehmens aussagt.',
+      'Empfehlen Sie eine Priorität für das nächste Jahr und begründen Sie, warum.',
+    ],
+    minWords: 180,
+    modelReport: `Report on the Promotional Budget for Turbodrinks
 
 Introduction
 The purpose of this report is to summarise the promotional budget figures provided and to make recommendations for next year's allocation. The findings cover advertising, free samples and trade fairs.
@@ -265,103 +345,74 @@ Recommendations
 3. Finally, as it may not be possible to increase the total budget significantly, an alternative should be considered: reallocating a small portion of trade fair spending to measurable digital campaigns.`,
   },
   {
-    title: 'Bericht zur Verbesserung von Mitarbeiterbeurteilungen',
-    de: `Einleitung
-Ziel dieses Berichts ist es, zentrale Probleme bei Mitarbeiterbeurteilungen darzustellen und Empfehlungen zur Verbesserung der Wirksamkeit zu geben. Die Erkenntnisse basieren auf typischen Problemen, die von Mitarbeitenden und Vorgesetzten berichtet werden.
-
-Ergebnisse
-Leistungsbeurteilungen werden häufig als subjektiv wahrgenommen. Das kann ehrliche Kommunikation hemmen und die Motivation senken, besonders wenn Mitarbeitende den Eindruck haben, dass persönliche Voreingenommenheit die Bewertungen beeinflusst.
-
-Außerdem zeigt sich, dass einige Mitarbeitende in Beurteilungsgesprächen nicht offen sagen, was sie denken. Dadurch werden Schwächen und Entwicklungsbedarfe möglicherweise nicht früh genug angesprochen.
-
-Zusätzlich sind Vorgesetzte mitunter nicht ausreichend sensibilisiert, wie ihr Feedback ankommt. Das kann zu Missverständnissen und mangelnder Verbindlichkeit bei vereinbarten Maßnahmen führen.
-
-Empfehlungen
-1. Es wird empfohlen, ein standardisiertes Beurteilungsraster einzuführen, da dies Konsistenz erhöht und Subjektivität reduziert.
-2. Zudem sollten Vorgesetzte im Geben von konstruktivem Feedback geschult werden, um Kommunikation und Motivation zu verbessern.
-3. Da sich Bias nicht vollständig ausschließen lässt, sollte eine Alternative geprüft werden: Managerfeedback mit Selbsteinschätzung und klaren, messbaren Zielen zu kombinieren.`,
-    en: `Report on Improving Staff Appraisals
-
-Introduction
-The purpose of this report is to outline key issues with staff appraisals and to make recommendations to improve their effectiveness. The findings are based on typical problems reported by employees and supervisors.
-
-Findings
-Performance reviews are often perceived as subjective. This can discourage honest communication and may reduce motivation, particularly if employees feel that personal bias affects evaluations.
-
-It can also be seen that some employees do not speak their minds during appraisal meetings. As a result, weaknesses and development needs may not be addressed early enough.
-
-In addition, supervisors may be unaware of how their feedback is received. This can lead to misunderstandings and a lack of commitment to agreed actions.
-
-Recommendations
-1. It is recommended that a standard appraisal framework is introduced, because this will increase consistency and reduce subjectivity.
-2. Furthermore, supervisors should receive training on giving constructive feedback in order to improve communication and motivation.
-3. Finally, as it may not be possible to remove all bias, an alternative should be considered: combining manager feedback with self-assessment and clear, measurable objectives.`,
-  },
-  {
-    title: 'Bericht zur Senkung der Personalfluktuation',
-    de: `Einleitung
-Ziel dieses Berichts ist es, mögliche Ursachen für Personalfluktuation zu identifizieren und Maßnahmen zur besseren Bindung von Mitarbeitenden zu empfehlen. Betrachtet werden Arbeitsbedingungen, Recruiting-Praktiken und Entwicklungsmöglichkeiten.
-
-Ergebnisse
-Hohe Fluktuation hängt oft mit falschen Erwartungen im Recruiting zusammen. Wenn Aufgaben, Anforderungen und Arbeitsbedingungen nicht klar kommuniziert werden, verlassen Mitarbeitende das Unternehmen möglicherweise frühzeitig.
-
-Zudem kann fehlende Weiterbildung die Bindung schwächen. Mitarbeitende mit hoher Qualifikation erwarten häufig klare Entwicklungspfade und Unterstützung.
-
-Schließlich können Gehalt und Arbeitsbelastung zu Unzufriedenheit beitragen, insbesondere wenn Verantwortung nicht mit Anerkennung einhergeht.
-
-Empfehlungen
-1. Es wird empfohlen, im Recruiting klarere Rollenbeschreibungen und strukturierte Auswahlkriterien zu nutzen, da dies die Passung erhöht und frühe Abgänge reduziert.
-2. Außerdem sollte ein Weiterbildungs- und Entwicklungsplan umgesetzt werden, um Leistung und Motivation zu stärken.
-3. Da deutliche Gehaltserhöhungen ggf. nicht möglich sind, sollte eine Alternative geprüft werden: mehr Flexibilität, Anerkennung und Karrierepfade.`,
-    en: `Report on Reducing Staff Turnover
+    scenario:
+      'Ihr Unternehmen hat eine auffällig hohe Personalfluktuation. Die Personalabteilung hat kürzlich ausgeschiedene Mitarbeitende befragt, warum sie das Unternehmen verlassen haben. Sie wurden gebeten, die Ergebnisse zusammenzufassen und Maßnahmen zur besseren Bindung von Mitarbeitenden zu empfehlen. Schauen Sie sich das Diagramm unten an.',
+    charts: [
+      {
+        type: 'pie',
+        title: 'Warum haben Sie das Unternehmen verlassen? (ehemalige Mitarbeitende)',
+        data: [
+          { label: 'Erwartungen im Recruiting nicht erfüllt', value: 45 },
+          { label: 'Fehlende Weiterbildung/Entwicklung', value: 30 },
+          { label: 'Gehalt/Arbeitsbelastung', value: 25 },
+        ],
+      },
+    ],
+    hints: [
+      'Gehen Sie auf den größten Grund ein und was das Unternehmen dagegen tun kann.',
+      'Erwähnen Sie auch die beiden kleineren Gründe.',
+    ],
+    minWords: 180,
+    modelReport: `Report on Reducing Staff Turnover
 
 Introduction
-The purpose of this report is to identify possible causes of staff turnover and to recommend measures to improve retention. The findings consider working conditions, recruitment practices and development opportunities.
+The purpose of this report is to identify possible causes of staff turnover and to recommend measures to improve retention. The findings are based on a survey of employees who recently left the company.
 
 Findings
-High staff turnover is often linked to mismatched expectations during the recruitment process. If job requirements and working conditions are not communicated clearly, employees may leave early.
+The results show that 45% of respondents left because their expectations set during recruitment were not met, for example regarding job requirements and working conditions that were not communicated clearly.
 
-In addition, limited training and development can reduce engagement. Employees with strong professional qualifications may expect clear progression and support.
+A further 30% cited limited training and development opportunities. Employees with strong professional qualifications reported expecting clear progression and support that was not provided.
 
-Finally, pay and workload may contribute to dissatisfaction, particularly if employees feel that responsibilities are not matched by recognition.
+The remaining 25% pointed to pay and workload, particularly feeling that their responsibilities were not matched by adequate recognition.
 
 Recommendations
-1. It is recommended that the recruitment process includes clearer role descriptions and structured selection criteria, because this will improve fit and reduce early exits.
+1. It is recommended that the recruitment process includes clearer role descriptions and structured selection criteria, because this will improve fit and directly address the largest group of leavers.
 2. Furthermore, a staff training and development plan should be implemented in order to support performance and motivation.
 3. Finally, as it may not be possible to increase salaries significantly, an alternative should be considered: improving flexibility, recognition and career pathways.`,
   },
   {
-    title: 'Bericht zur organisatorischen Restrukturierung',
-    de: `Einleitung
-Ziel dieses Berichts ist es, Restrukturierungsoptionen zu bewerten und Empfehlungen zur Effizienzsteigerung zu geben. Betrachtet werden Ebenenabbau, Rechenschaftspflichten und mögliche Auswirkungen auf Mitarbeitende.
-
-Ergebnisse
-Ein Ebenenabbau kann die Effizienz erhöhen, indem Entscheidungswege verkürzt und Verantwortlichkeiten klarer werden. Er kann jedoch auch Unsicherheit erzeugen und zu Stellenabbau führen.
-
-Zudem erfordert Restrukturierung häufig eine sorgfältige Mittelzuweisung, da kurzfristige Kosten durch Schulungen, Umzüge oder Systemänderungen steigen können.
-
-Außerdem muss die Rechenschaftspflicht gegenüber dem Management klar geregelt werden, um Unklarheiten in Zuständigkeiten zu vermeiden.
-
-Empfehlungen
-1. Es wird empfohlen, die Restrukturierung auf vereinfachte Berichtslinien zu fokussieren, da dies Entscheidungsgeschwindigkeit und Verantwortlichkeit verbessert.
-2. Zudem sollte die Change-Kommunikation gestärkt werden, um Unsicherheit zu reduzieren und Motivation zu schützen.
-3. Da sich Stellenabbau ggf. nicht vollständig vermeiden lässt, sollte eine Alternative geprüft werden: interne Versetzungen und gezielte Schulungen, um Schlüsselkompetenzen zu halten.`,
-    en: `Report on Organisational Restructuring
+    scenario:
+      'Ihr Unternehmen plant eine organisatorische Restrukturierung mit Ebenenabbau. Vor der Umsetzung wurden die Mitarbeitenden zu ihren größten Bedenken befragt. Sie wurden gebeten, die Ergebnisse zusammenzufassen und Empfehlungen für das Management zu geben. Schauen Sie sich das Diagramm unten an.',
+    charts: [
+      {
+        type: 'pie',
+        title: 'Was ist Ihre größte Sorge bei der geplanten Restrukturierung?',
+        data: [
+          { label: 'Unsicherer Arbeitsplatz', value: 50 },
+          { label: 'Unklare Zuständigkeiten', value: 30 },
+          { label: 'Mehr Arbeitsbelastung während der Umstellung', value: 20 },
+        ],
+      },
+    ],
+    hints: [
+      'Gehen Sie auf die größte Sorge der Mitarbeitenden ein und wie das Management sie ansprechen kann.',
+      'Erwähnen Sie auch die beiden anderen Bedenken.',
+    ],
+    minWords: 180,
+    modelReport: `Report on Organisational Restructuring
 
 Introduction
-The purpose of this report is to assess restructuring options and to make recommendations to improve efficiency. The findings consider delayering, accountability and potential impacts on staff.
+The purpose of this report is to assess employee concerns about the planned restructuring and to make recommendations to improve efficiency while protecting staff wellbeing. The findings are based on a survey conducted before implementation.
 
 Findings
-Delayering may increase efficiency by reducing decision-making time and clarifying accountability. However, it can also create uncertainty and may result in redundancies.
+The results show that 50% of employees are most concerned about job security, fearing that delayering may result in redundancies. A further 30% are worried about unclear responsibilities once reporting lines change, while the remaining 20% expect an increased workload during the transition period.
 
-It can be seen that restructuring often requires careful allocation of funds, as short-term costs may increase due to training, relocation or system changes.
-
-In addition, accountability to senior management must be clearly defined to avoid confusion about responsibilities.
+It can be seen that restructuring often requires careful allocation of funds, as short-term costs may increase due to training, relocation or system changes. In addition, accountability to senior management must be clearly defined to avoid confusion about responsibilities.
 
 Recommendations
-1. It is recommended that restructuring focuses on simplifying reporting lines, because this will improve decision speed and accountability.
-2. Furthermore, change communication should be strengthened in order to reduce uncertainty and protect motivation.
-3. Finally, as it may not be possible to avoid redundancies completely, an alternative should be considered: redeployment and targeted training to retain key skills.`,
+1. It is recommended that restructuring focuses on simplifying reporting lines, because this will directly address the concern about unclear responsibilities.
+2. Furthermore, change communication should be strengthened in order to reduce uncertainty about job security and protect motivation.
+3. Finally, as it may not be possible to avoid redundancies completely, an alternative should be considered: redeployment and targeted training to retain key skills, easing concerns about increased workload during the transition.`,
   },
 ];
 
@@ -370,4 +421,4 @@ function withIds<T extends object>(prefix: string, items: T[]): (T & { id: strin
 }
 
 export const EMAIL_EXAMPLES: EmailTask[] = withIds('email-ex', EMAIL_TASKS);
-export const REPORT_EXAMPLES: WritingExample[] = withIds('report-ex', REPORT_TEXTS);
+export const REPORT_EXAMPLES: ReportTask[] = withIds('report-ex', REPORT_TASKS);
